@@ -1,5 +1,6 @@
 import random
 from deap import tools, base, creator
+import numpy as np
 
 ##Init values##
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))        #Create the Fitness function.
@@ -41,15 +42,14 @@ def main():
     # Evaluate the entire population
     fitnesses = map(toolbox.evaluate, pop)
     for ind, fit in zip(pop, fitnesses):
-        print(ind,fit)
-        ind.fitness.values = fit
+        # print(ind,(fit,),ind.fitness.values)
+        ind.fitness.values = (fit,)
 
     for g in range(NGEN):
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
-        offspring = map(toolbox.clone, offspring)
-
+        offspring = list(map(toolbox.clone, offspring))
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < CXPB:
@@ -66,11 +66,11 @@ def main():
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         fitnesses = map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+            ind.fitness.values = (fit,)
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
 
     return pop
 
-main()
+print(np.min(np.ndarray.flatten(np.array(main()))))
