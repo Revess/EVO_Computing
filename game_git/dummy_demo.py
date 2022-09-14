@@ -111,6 +111,6 @@ for generation in range(NGEN):
 ##Evaluate the last one with your own eyes :)
 env.speed = "normal"
 env.logs = "on"
-print("NOWGETTING THE BEST ONE!!!!")
-print(np.argmax([individual.fitness.values[0] for individual in population]))
+print("NOWGETTING THE BEST ONE!!!! N0.: ",np.argmax([individual.fitness.values[0] for individual in population]))
+print("Settings: ", population[np.argmax([individual.fitness.values[0] for individual in population])])
 env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
