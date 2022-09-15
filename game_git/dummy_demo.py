@@ -1,6 +1,6 @@
 import sys, os
 sys.path.insert(0, 'evoman') 
-# os.environ["SDL_VIDEODRIVER"] = "dummy"
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 from environment import Environment
 from demo_controller import player_controller, enemy_controller
 
@@ -8,6 +8,9 @@ import random
 from deap import tools, base, creator
 import numpy as np
 from math import ceil
+import pandas as pd
+from datetime import datetime
+import os
 
 ##~~Initialization~~##
 ##Here the enviroment gets setup
@@ -67,7 +70,7 @@ celta = 1.004
 ##This is where the simulation is run, and will return the player health, enemy health and the time (p,e,t) as an array
 def evaluate(individual):
     f,p,e,t = env.play(pcont=np.array(individual))
-    f = (gamma*(100-(e**beta))) + (alpha*(100*ceil(p/100))) - (celta**t)
+    #f = (gamma*(100-(e**beta))) + (alpha*(100*ceil(p/100))) - (celta**t)
     return f
     
 ##Set the DEAP function
@@ -84,6 +87,7 @@ for ind, fit in zip(population, fitnesses):
     ind.fitness.values = (fit,)
 
 ##~~The Evolution~~##
+fitness_gen = []
 for generation in range(NGEN):
     print("Generation: ",generation)
     ##Get some offspring with the tournement selection
@@ -115,11 +119,33 @@ for generation in range(NGEN):
 
     # The population is entirely replaced by the offspring
     population[:] = offspring
+    if generation == 0:
+        fitness_gen = [[individual.fitness.values[0] for individual in population]]
+    else:
+        fitness_gen = fitness_gen + [[individual.fitness.values[0] for individual in population]]
+    print('Mean fitness in generation:',generation,'is',np.mean([individual.fitness.values[0] for individual in population]))
+
 
 ##Evaluate the last one with your own eyes :)
 env.speed = "normal"
 env.logs = "on"
 print("NOWGETTING THE BEST ONE!!!! N0.: ",np.argmax([individual.fitness.values[0] for individual in population]))
 print("Settings: ", population[np.argmax([individual.fitness.values[0] for individual in population])])
-while True:
-    env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
+env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
+
+# Formatting dataframe and Saving results
+datim = datetime.now().strftime("%d-%m-%Y_%H:%M")
+filename = '_results_log.xlsx'
+folder = 'data/log/'
+dirpath = os.path.dirname(__file__)
+folderpath = folder + datim + filename
+filepath = os.path.join(dirpath, folderpath)
+
+fitness_df = pd.DataFrame(fitness_gen).transpose()
+fitness_df['individual'] = fitness_df.index
+fitness_df = pd.melt(fitness_df, id_vars='individual', value_vars=range(0,NGEN))
+fitness_df = fitness_df.sort_values(['variable','individual'])
+fitness_df = fitness_df.reset_index(drop=True)
+fitness_df = fitness_df.rename(columns={'variable':'generation'})
+
+fitness_df.to_excel(filepath)
