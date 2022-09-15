@@ -7,6 +7,7 @@ from demo_controller import player_controller, enemy_controller
 import random
 from deap import tools, base, creator
 import numpy as np
+from math import ceil
 
 ##~~Initialization~~##
 ##Here the enviroment gets setup
@@ -15,7 +16,7 @@ env = Environment(
     # multiplemode="yes",
     # enemies=[1,2,3,4,5,6,7,8],
     multiplemode="no",
-    enemies=[8],
+    enemies=[6],
     loadplayer="yes",
     loadenemy="yes",
     level=1,
@@ -36,12 +37,12 @@ env = Environment(
 
 ##Here we set the way of the fitness value, 1 is maximize and -1 is minimize,
 ##The values to fit are: player health (max), enemy health (min) and time (min)
-creator.create("FitnessMin", base.Fitness, weights=(1.0, -1.0, -1.0))      
+creator.create("Fitness", base.Fitness, weights=(1.0,))      
 ##Create the container for the individuals
-creator.create("IndividualContainer", list, fitness=creator.FitnessMin)     
+creator.create("IndividualContainer", list, fitness=creator.Fitness)     
 
 ##Set some factors like the number of genes
-nGenes = (env.get_num_sensors()+1)*n_hidden_neurons + (n_hidden_neurons+1)*5
+nGenes = (env.get_num_sensors()+1) * n_hidden_neurons + (n_hidden_neurons + 1) * 5
 geneMin = -1
 geneMax = 1
 toolbox = base.Toolbox()
@@ -58,10 +59,17 @@ toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
 toolbox.register("select", tools.selTournament, tournsize=3) 
 
+gamma = 1
+alpha = 1
+beta = 1.25
+celta = 1.004
+
 ##This is where the simulation is run, and will return the player health, enemy health and the time (p,e,t) as an array
 def evaluate(individual):
     f,p,e,t = env.play(pcont=np.array(individual))
-    return p,e,t
+    f = (gamma*(100-(e**beta))) + (alpha*(100*ceil(p/100))) - (celta**t)
+    return f
+    
 ##Set the DEAP function
 toolbox.register("evaluate", evaluate)
 
@@ -73,7 +81,7 @@ CXPB, MUTPB, NGEN = 0.5, 0.2, 8
 ##Initial evaluation of the population, this is for running the algo properly
 fitnesses = map(toolbox.evaluate, population)
 for ind, fit in zip(population, fitnesses):
-    ind.fitness.values = (fit[0],fit[1],fit[2],)
+    ind.fitness.values = (fit,)
 
 ##~~The Evolution~~##
 for generation in range(NGEN):
@@ -103,7 +111,7 @@ for generation in range(NGEN):
     invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
     fitnesses = map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
-        ind.fitness.values = (fit[0],fit[1],fit[2],)
+        ind.fitness.values = (fit,)
 
     # The population is entirely replaced by the offspring
     population[:] = offspring
@@ -113,4 +121,5 @@ env.speed = "normal"
 env.logs = "on"
 print("NOWGETTING THE BEST ONE!!!! N0.: ",np.argmax([individual.fitness.values[0] for individual in population]))
 print("Settings: ", population[np.argmax([individual.fitness.values[0] for individual in population])])
-env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
+while True:
+    env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
