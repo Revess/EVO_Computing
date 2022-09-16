@@ -79,7 +79,7 @@ toolbox.register("evaluate", evaluate)
 ##Variables##
 popSize = 10
 population = toolbox.population(n=popSize)
-CXPB, MUTPB, NGEN = 0.5, 0.2, 8
+CXPB, MUTPB, NGEN = 0.5, 0.2, 50
 
 ##Initial evaluation of the population, this is for running the algo properly
 fitnesses = map(toolbox.evaluate, population)

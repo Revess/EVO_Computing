@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4fa04935-cea2-492b-9078-a5a0a7dccc27" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_git/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_git/plotting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_git/dummy_demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_git/dummy_demo.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +35,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.dummy_demo">
+  <component name="RunManager" selected="Python.plotting">
     <configuration name="controller_specialist_demo" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="git repo" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -99,8 +98,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.dummy_demo" />
         <item itemvalue="Python.plotting" />
+        <item itemvalue="Python.dummy_demo" />
         <item itemvalue="Python.controller_specialist_demo" />
       </list>
     </recent_temporary>
@@ -114,7 +113,7 @@
       <option name="presentableId" value="Default" />
       <updated>1662636953677</updated>
       <workItem from="1662636957615" duration="323000" />
-      <workItem from="1663322896560" duration="2416000" />
+      <workItem from="1663322896560" duration="2760000" />
     </task>
     <servers />
   </component>
