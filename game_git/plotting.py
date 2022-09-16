@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 # Loading most recently generated dataframe
-folder = 'data/log/'
+folder = 'log/'
 dirpath = os.path.dirname(__file__)
 filepath = os.path.join(dirpath, folder)
 entries = os.listdir(filepath)

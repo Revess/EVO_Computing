@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4fa04935-cea2-492b-9078-a5a0a7dccc27" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_git/dummy_demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_git/dummy_demo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_git/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_git/plotting.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,9 +82,6 @@
       <module name="git repo" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/game_git" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -117,7 +114,7 @@
       <option name="presentableId" value="Default" />
       <updated>1662636953677</updated>
       <workItem from="1662636957615" duration="323000" />
-      <workItem from="1663322896560" duration="1476000" />
+      <workItem from="1663322896560" duration="2416000" />
     </task>
     <servers />
   </component>
