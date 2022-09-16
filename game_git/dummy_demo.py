@@ -134,18 +134,25 @@ print("Settings: ", population[np.argmax([individual.fitness.values[0] for indiv
 env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
 
 # Formatting dataframe and Saving results
-datim = datetime.now().strftime("%d-%m-%Y_%H:%M")
-filename = '_results_log.xlsx'
-folder = 'data/log/'
+
+folder = 'log/'
 dirpath = os.path.dirname(__file__)
-folderpath = folder + datim + filename
-filepath = os.path.join(dirpath, folderpath)
+folderpath = os.path.join(dirpath, folder)
+
+if os.path.isdir(folderpath) == False:
+    os.mkdir(folderpath)
+    print('Log folder not found, created a new one.')
+
+datim = datetime.now().strftime("%d%m%y_%H%M")
+filetype = '_results_log.xlsx'
+filename = datim + filetype
+filepath = os.path.join(folderpath, filename)
 
 fitness_df = pd.DataFrame(fitness_gen).transpose()
 fitness_df['individual'] = fitness_df.index
 fitness_df = pd.melt(fitness_df, id_vars='individual', value_vars=range(0,NGEN))
 fitness_df = fitness_df.sort_values(['variable','individual'])
 fitness_df = fitness_df.reset_index(drop=True)
-fitness_df = fitness_df.rename(columns={'variable':'generation'})
+fitness_df = fitness_df.rename(columns={'variable':'generation', 'value':'fitness value'})
 
 fitness_df.to_excel(filepath)
