@@ -17,6 +17,8 @@ parser.add_argument('-c', '--cxpb', metavar='F', type=float, default=0.5, help='
 parser.add_argument('-m', '--mutpb', metavar='F', type=float, default=0.2, help='Mutation probability')
 parser.add_argument('-g', '--ngens', metavar='N', type=int, default=15, help='Number of generations')
 
+USETOURNAMENT = False
+
 args = parser.parse_args()
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~VAR~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
@@ -91,7 +93,11 @@ toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
 ##EDIT HERE THE MUTATION FUNCTION, edit tools.mutGaussian to your function
 
-toolbox.register("select", tools.selTournament, tournsize=3) 
+if USETOURNAMENT:
+    toolbox.register("select", tools.selTournament, tournsize=3) 
+else:
+    #toolbox.register("select", tools.selRandom)
+    toolbox.register("select", tools.selStochasticUniversalSampling)
 ##EDIT HERE THE SELECTION FUNCTION, edit tools.selTournament to your function
 
 ##This is where the simulation is run, and will return the player health, enemy health and the time (p,e,t) as an array
@@ -155,5 +161,30 @@ env.speed = "normal"
 env.logs = "on"
 print("NOWGETTING THE BEST ONE!!!! N0.: ",np.argmax([individual.fitness.values[0] for individual in population]))
 print("Settings: ", population[np.argmax([individual.fitness.values[0] for individual in population])])
-while True:
-    env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
+
+# Updated some information to further investigate the results of the algorithms:
+fitness_total = 0
+player_life_total = 0
+enemy_life_total = 0
+time_total = 0
+size = 5
+
+for x in range(size):
+    f,p,e,t = env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
+    fitness_total += f
+    player_life_total += p
+    enemy_life_total += e
+    time_total += t
+
+if USETOURNAMENT:
+    print("Used Tournament")
+else:
+    print("Used alternative")
+print("Total:")
+print("Fitness ({f_t}) - average ({f_a})".format(f_t = fitness_total, f_a = fitness_total / size))
+print("player_life_total ({p_t}) - average ({p_a})".format(p_t = player_life_total, p_a = player_life_total / size))
+if enemy_life_total == 0:
+    print("enemy_life_total ({e_t}) - average ({e_a})".format(e_t = enemy_life_total, e_a = 0))
+else:    
+    print("enemy_life_total ({e_t}) - average ({e_a})".format(e_t = enemy_life_total, e_a = enemy_life_total / size))
+print("time_total ({t_t}) - average ({t_a})".format(t_t = time_total, t_a = time_total / size))
