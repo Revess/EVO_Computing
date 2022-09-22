@@ -1,12 +1,16 @@
 import sys, os
 sys.path.insert(0, 'evoman') 
-# os.environ["SDL_VIDEODRIVER"] = "dummy" #Uncomment this line to run headless
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+os.environ["SDL_VIDEODRIVER"] = "dummy" #Uncomment this line to run headless
 from environment import Environment
 from demo_controller import player_controller, enemy_controller
 import random
 from deap import tools, base, creator
 import numpy as np
 from math import ceil
+
+import threading as td
+from multiprocessing import Pool
 
 import argparse
 parser = argparse.ArgumentParser(description='Train the EA algorithm for EVOMAN')
@@ -36,6 +40,7 @@ POPSIZE = args.popsize
 CXPB = args.cxpb
 MUTPB = args.mutpb
 NGEN = args.ngens
+NPOOLS = 10
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~Initialization~~~~~~~~~~~~~~~~~~~~~~~##
@@ -107,53 +112,59 @@ toolbox.register("evaluate", evaluate)
 
 population = toolbox.population(n=POPSIZE)
 
+def un():
+    return 1
+
 ##Initial evaluation of the population, this is for running the algo properly
-fitnesses = map(toolbox.evaluate, population)
-for ind, fit in zip(population, fitnesses):
-    ind.fitness.values = (fit,)
-
-##~~~~~~~~~~~~~~~~~~~~~~~~The Evolution~~~~~~~~~~~~~~~~~~~~~~~~##
-for generation in range(NGEN):
-    print("Generation: ",generation)
-    ##Get some offspring with the tournement selection
-    offspring = list(
-        map(
-            toolbox.clone,
-            toolbox.select(population, len(population))
-        )
-    )
-    
-    ##Do the crossover, CXPB is the probability of crossingover
-    ##In case of a different crossover (for example with 3 offspring you will need to edit this!!!!)
-    for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            if random.random() < CXPB:
-                toolbox.mate(child1, child2)
-                del child1.fitness.values
-                del child2.fitness.values
-    
-    #Mutate the offspring, the MUTPB is a random chance of mulation
-    for mutant in offspring:
-        if random.random() < MUTPB:
-            toolbox.mutate(mutant)
-            del mutant.fitness.values
-
-    # Evaluate the individuals with an invalid fitness, so reevaluate
-    invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-    fitnesses = map(toolbox.evaluate, invalid_ind)
-    for ind, fit in zip(invalid_ind, fitnesses):
+if __name__ == "__main__":
+    with Pool(NPOOLS) as pool:
+        fitnesses = pool.map(toolbox.evaluate, population)
+    for ind, fit in zip(population, fitnesses):
         ind.fitness.values = (fit,)
 
-    # The population is entirely replaced by the offspring
-    population[:] = offspring
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+    ##~~~~~~~~~~~~~~~~~~~~~~~~The Evolution~~~~~~~~~~~~~~~~~~~~~~~~##
+    for generation in range(NGEN):
+        print("Generation: ",generation)
+        ##Get some offspring with the tournement selection
+        offspring = list(
+            map(
+                toolbox.clone,
+                toolbox.select(population, len(population))
+            )
+        )
+        
+        ##Do the crossover, CXPB is the probability of crossingover
+        ##In case of a different crossover (for example with 3 offspring you will need to edit this!!!!)
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+                if random.random() < CXPB:
+                    toolbox.mate(child1, child2)
+                    del child1.fitness.values
+                    del child2.fitness.values
+        
+        #Mutate the offspring, the MUTPB is a random chance of mulation
+        for mutant in offspring:
+            if random.random() < MUTPB:
+                toolbox.mutate(mutant)
+                del mutant.fitness.values
 
+        # Evaluate the individuals with an invalid fitness, so reevaluate
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        with Pool(NPOOLS) as pool:
+            fitnesses = pool.map(toolbox.evaluate, population)
+        # fitnesses = map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
+            ind.fitness.values = (fit,)
 
-##Evaluate the last one with your own eyes :)
+        # The population is entirely replaced by the offspring
+        population[:] = offspring
+    ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
-###HERE THE CODE OF YARI SHOULD INSERT!!!, THUS THE PLOTS ETC
-env.speed = "normal"
-env.logs = "on"
-print("NOWGETTING THE BEST ONE!!!! N0.: ",np.argmax([individual.fitness.values[0] for individual in population]))
-print("Settings: ", population[np.argmax([individual.fitness.values[0] for individual in population])])
-while True:
-    env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
+    ##Evaluate the last one with your own eyes :)
+
+    ###HERE THE CODE OF YARI SHOULD INSERT!!!, THUS THE PLOTS ETC
+    env.speed = "normal"
+    env.logs = "on"
+    print("NOWGETTING THE BEST ONE!!!! N0.: ",np.argmax([individual.fitness.values[0] for individual in population]))
+    print("Settings: ", population[np.argmax([individual.fitness.values[0] for individual in population])])
+    while True:
+        env.play(pcont=np.array(population[np.argmax([individual.fitness.values[0] for individual in population])]))
