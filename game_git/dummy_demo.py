@@ -1,8 +1,11 @@
+from json import tool
 import sys, os
 sys.path.insert(0, 'evoman') 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 from environment import Environment
 from demo_controller import player_controller, enemy_controller
+
+from plotting import plot
 
 import random
 from deap import tools, base, creator
@@ -19,7 +22,7 @@ env = Environment(
     # multiplemode="yes",
     # enemies=[1,2,3,4,5,6,7,8],
     multiplemode="no",
-    enemies=[6],
+    enemies=[1],
     loadplayer="yes",
     loadenemy="yes",
     level=1,
@@ -60,7 +63,12 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 ##The different functions for the EA
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
-toolbox.register("select", tools.selTournament, tournsize=3)
+
+USETOURNAMENT = True
+if USETOURNAMENT:
+    toolbox.register("select", tools.selTournament, tournsize=3)
+else:
+    toolbox.register("select", tools.selRoulette)
 
 gamma = 1
 alpha = 1
@@ -77,9 +85,9 @@ def evaluate(individual):
 toolbox.register("evaluate", evaluate)
 
 ##Variables##
-popSize = 8
+popSize = 10
 population = toolbox.population(n=popSize)
-CXPB, MUTPB, NGEN = 0.5, 0.2, 10
+CXPB, MUTPB, NGEN = 0.5, 0.2, 50
 
 ##Initial evaluation of the population, this is for running the algo properly
 fitnesses = map(toolbox.evaluate, population)
@@ -159,3 +167,5 @@ fitness_df = fitness_df.reset_index(drop=True)
 fitness_df = fitness_df.rename(columns={'variable':'generation', 'value':'fitness value'})
 
 fitness_df.to_excel(filepath)
+
+plot()
