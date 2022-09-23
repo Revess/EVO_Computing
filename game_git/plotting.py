@@ -40,5 +40,6 @@ plt.show()
 
 # Make heatmap
 fig, ax = plt.subplots()
-im = ax.imshow(wide, interpolation=)
+#im = ax.imshow(wide, interpolation=)
+im = ax.imshow(wide)
 plt.show()

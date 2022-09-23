@@ -7,7 +7,7 @@ from demo_controller import player_controller, enemy_controller
 import random
 from deap import tools, base, creator
 import numpy as np
-from math import ceil
+from math import ceil, tanh
 import pandas as pd
 from datetime import datetime
 import os
@@ -60,7 +60,7 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 ##The different functions for the EA
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
-toolbox.register("select", tools.selTournament, tournsize=3) 
+toolbox.register("select", tools.selTournament, tournsize=3)
 
 gamma = 1
 alpha = 1
@@ -70,16 +70,16 @@ celta = 1.004
 ##This is where the simulation is run, and will return the player health, enemy health and the time (p,e,t) as an array
 def evaluate(individual):
     f,p,e,t = env.play(pcont=np.array(individual))
-    f = (gamma*(100-(e**beta))) + (alpha*(100*ceil(p/100))) - (celta**t)
+    f = -tanh(365/(10**8) * (p**0.15) * (100 - e) * (t - 1000)) * (66-0.33*e) + 0.3*(p**0.15)*(100-e) 
     return f,p,e,t
     
 ##Set the DEAP function
 toolbox.register("evaluate", evaluate)
 
 ##Variables##
-popSize = 50
+popSize = 8
 population = toolbox.population(n=popSize)
-CXPB, MUTPB, NGEN = 0.5, 0.2, 50
+CXPB, MUTPB, NGEN = 0.5, 0.2, 10
 
 ##Initial evaluation of the population, this is for running the algo properly
 fitnesses = map(toolbox.evaluate, population)
@@ -119,8 +119,8 @@ for generation in range(NGEN):
 
     # The population is entirely replaced by the offspring
     population[:] = offspring
-    print('fitnesses')
-    print(fitnesses)
+    #print('fitnesses')
+    #print(fitnesses)
     # Save results per generation
     if generation == 0:
         fitness_gen = [[individual.fitness.values[0] for individual in population]]
