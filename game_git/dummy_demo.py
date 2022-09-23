@@ -14,7 +14,7 @@ import os
 
 ##~~Initialization~~##
 ##Here the enviroment gets setup
-n_hidden_neurons = 100
+n_hidden_neurons = 10
 env = Environment(
     # multiplemode="yes",
     # enemies=[1,2,3,4,5,6,7,8],
@@ -70,21 +70,21 @@ celta = 1.004
 ##This is where the simulation is run, and will return the player health, enemy health and the time (p,e,t) as an array
 def evaluate(individual):
     f,p,e,t = env.play(pcont=np.array(individual))
-    #f = (gamma*(100-(e**beta))) + (alpha*(100*ceil(p/100))) - (celta**t)
-    return f
+    f = (gamma*(100-(e**beta))) + (alpha*(100*ceil(p/100))) - (celta**t)
+    return f,p,e,t
     
 ##Set the DEAP function
 toolbox.register("evaluate", evaluate)
 
 ##Variables##
-popSize = 10
+popSize = 50
 population = toolbox.population(n=popSize)
 CXPB, MUTPB, NGEN = 0.5, 0.2, 50
 
 ##Initial evaluation of the population, this is for running the algo properly
 fitnesses = map(toolbox.evaluate, population)
 for ind, fit in zip(population, fitnesses):
-    ind.fitness.values = (fit,)
+    ind.fitness.values = (fit[0],)
 
 ##~~The Evolution~~##
 fitness_gen = []
@@ -115,10 +115,13 @@ for generation in range(NGEN):
     invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
     fitnesses = map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
-        ind.fitness.values = (fit,)
+        ind.fitness.values = (fit[0],)
 
     # The population is entirely replaced by the offspring
     population[:] = offspring
+    print('fitnesses')
+    print(fitnesses)
+    # Save results per generation
     if generation == 0:
         fitness_gen = [[individual.fitness.values[0] for individual in population]]
     else:
