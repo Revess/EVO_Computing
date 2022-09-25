@@ -42,6 +42,7 @@ class SA():
         self.t = 0
         self.x_old = intial
         self.y_old = self.runSim(self.x_old.copy(), self.name_old)
+        self.history = []
 
     def proposal(self, x):
         name = self.namePrefix + "_" + str(self.stepcount+1)
@@ -89,9 +90,7 @@ class SA():
         T = (self.C*np.log(self.t+self.T0))**-1
         self.t = self.t+1
         x_prop, y_prop, name = self.proposal(self.x_old)
-        print(x_prop, y_prop, name)
         A = self.evaluate(y_prop, self.y_old, T)
-        print(A)
         self.select(x_prop, y_prop, name, A)
 
     def run(self, epochs):
@@ -99,7 +98,11 @@ class SA():
             print("Epoch: ",epoch+1, "Fitness: ", self.y_old)
             self.step()
             self.stepcount+=1
+            self.history.append(self.x_old)
+            with open("./history.pkl", "wb") as file_:
+                pkl.dump(self.history, file_)
         print("Settings: ", self.x_old)
+
 
 initial = [
      100, #"neurons":   std: 33
