@@ -45,12 +45,17 @@ ngenes = (env.get_num_sensors()+1) * neurons + (neurons + 1) * 5
 toolbox = base.Toolbox()
 creator.create("Fitness", base.Fitness, weights=(1.0,))      
 creator.create("IndividualContainer", list, fitness=creator.Fitness)
-toolbox.register("initialSensor", random.uniform, geneMin, geneMax)
+toolbox.register("initialSensor", random.uniform, -1, 1)
 toolbox.register("individual", tools.initRepeat, creator.IndividualContainer, toolbox.initialSensor, n=ngenes)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutGaussian, mu=float(settings[8].split(":")[1].split()[0]), sigma=float(settings[9].split(":")[1].split()[0]), indpb=float(settings[10].split(":")[1].split()[0]))
-toolbox.register("select", tools.selTournament, tournsize=int(settings[11].split(":")[1].split()[0])) 
+
+if settings[-1].split(":")[1].split()[0] == "True":
+    toolbox.register("select", tools.selTournament, tournsize=int(settings[11].split(":")[1].split()[0])) 
+else:
+    toolbox.register("select", tools.selRoulette)
+
 def evaluate(individual):
     f,p,e,t = env.play(pcont=np.array(individual))
     f = -tanh(365/(10**8) * (p**0.15) * (100 - e) * (t - 1000)) * (66-0.33*e) + 0.3*(p**0.15)*(100-e) 
@@ -133,5 +138,5 @@ if __name__ == "__main__":
         if not os.path.exists("./finetuning"):
             os.mkdir("./finetuning")
 
-    with open("./finetuning/"+settings[12].split(":")[1].split()[0]+".pkl","wb") as file_:
+    with open("./finetuning/"+str(settings[12].split(":")[1].split()[0])+".pkl","wb") as file_:
         pkl.dump([fitnessPerGen,playerPerGen,enemyPerGen,timePerGen], file_)

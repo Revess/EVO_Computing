@@ -4,7 +4,7 @@ def plot():
     import os
 
     # Loading most recently generated dataframe
-    folder = 'log/'
+    folder = 'plots/'
     dirpath = os.path.dirname(__file__)
     filepath = os.path.join(dirpath, folder)
     entries = os.listdir(filepath)

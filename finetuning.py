@@ -17,29 +17,49 @@ import pandas as pd
 import datetime
 
 class SA():
-    SETTINGNAMES = ["neurons: ","geneMin: ","geneMax: ","popsize: ","cxpb: ","mutpb: ","ngens: ","npools: ","mu: ","sigma: ","indpb: ","tournsize: ","name: ","finetuning: "]
+    SETTINGNAMES = ["neurons: ","geneMin: ","geneMax: ","popsize: ","cxpb: ","mutpb: ","ngens: ","npools: ","mu: ","sigma: ","indpb: ","tournsize: ","name: ","finetuning: ", "tournament: "]
+    USETOURNAMENT = True
 
-    def __init__(self, intial, std=0.1, T0=1 ,C=1,prefix=datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")):
-        self.x_old = intial
-        self.name_old = 0
-        self.T0 = T0
-        self.std = std
-        self.C = C
-        self.t = 0
+    def __init__(self, intial, std=0.1, T0=1 ,C=1,prefix=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
         self.namePrefix = prefix
         self.stepcount = 0
+        self.name_old = self.namePrefix + "_" + str(self.stepcount+1)
+        self.T0 = T0
+        self.std = np.array([
+                [33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]])
+        self.C = C
+        self.t = 0
+        self.x_old = self.proposal(intial)
         self.y_old = self.runSim(self.x_old, self.name_old)
 
     def proposal(self, x):
         name = self.namePrefix + "_" + str(self.stepcount+1)
-        return np.random.multivariate_normal(
+        new_x = np.random.multivariate_normal(
             x,
             self.std
         ), self.runSim(x, name), name
+        for index, x in enumerate(new_x):
+            if ((index == 4 or index == 5 or index == 8) and x > 1) or (x < 0 and index != 8):
+                    x = 1
+            elif x < 0 and (index == 4 or index == 5 or index == 8):
+                x = 0.1
+        return new_x
         
     def runSim(self, x, name):
         x.append(name)
         x.append("True")
+        x.append(self.USETOURNAMENT)
         x = [self.SETTINGNAMES[index]+str(s)+"\n" for index, s in enumerate(x)]
         with open("settings.txt", "w") as file_:
             file_.writelines(x)
@@ -73,18 +93,18 @@ class SA():
         print("Settings: ", self.x_old)
 
 initial = [
-     100, #"neurons":
-     -1, #"geneMin":
-     1, #"geneMax":
-     50, #"popsize":
-     0.5, #"cxpb":
-     0.2, #"mutpb":
-     15, #"ngens":
-     5, #"npools":
-     0, #"mu":
-     1, #"sigma":
-     0.1, #"indpb":
-     3, #"tournsize":
+     100, #"neurons":   std: 33
+     -1, #"geneMin":    std: 0.1
+     1, #"geneMax":     std: 0.1
+     50, #"popsize":    std: 33
+     0.5, #"cxpb":      std: 0.01
+     0.2, #"mutpb":     std: 0.01
+     15, #"ngens":      std: 5
+     5, #"npools":      std: 33
+     0, #"mu":          std: 3
+     1, #"sigma":       std: 3
+     0.1, #"indpb":     std: 0.01
+     3, #"tournsize":   std: 3
 ]
 
 sa = SA(initial)

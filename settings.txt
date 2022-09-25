@@ -10,5 +10,6 @@ mu: 0
 sigma: 1
 indpb: 0.1
 tournsize: 3
-name: 0
+name: 2022-09-25_22-48-14_1
 finetuning: True
+tournament: True
