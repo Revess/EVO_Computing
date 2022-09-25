@@ -1,14 +1,14 @@
 neurons: 100
 geneMin: -1
 geneMax: 1
-popsize: 5
+popsize: 50
 cxpb: 0.5
 mutpb: 0.2
-ngens: 5
+ngens: 15
 npools: 5
 mu: 0
 sigma: 1
 indpb: 0.1
 tournsize: 3
-name: 8389
+name: 0
 finetuning: True

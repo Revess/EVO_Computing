@@ -14,21 +14,24 @@ import sys, os
 import numpy as np
 import pickle as pkl
 import pandas as pd
+import datetime
 
 class SA():
     SETTINGNAMES = ["neurons: ","geneMin: ","geneMax: ","popsize: ","cxpb: ","mutpb: ","ngens: ","npools: ","mu: ","sigma: ","indpb: ","tournsize: ","name: ","finetuning: "]
 
-    def __init__(self, intial, std=0.1, T0=1 ,C=1):
+    def __init__(self, intial, std=0.1, T0=1 ,C=1,prefix=datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")):
         self.x_old = intial
-        self.name_old = str(round(np.random.random()*10000))
-        self.y_old = self.runSim(self.x_old, self.name_old)
+        self.name_old = 0
         self.T0 = T0
         self.std = std
         self.C = C
         self.t = 0
+        self.namePrefix = prefix
+        self.stepcount = 0
+        self.y_old = self.runSim(self.x_old, self.name_old)
 
     def proposal(self, x):
-        name = str(round(np.random.random()*10000))
+        name = self.namePrefix + "_" + str(self.stepcount+1)
         return np.random.multivariate_normal(
             x,
             self.std
@@ -66,16 +69,17 @@ class SA():
         for epoch in range(epochs):
             print("Epoch: ",epoch+1, "Fitness: ", self.y_old)
             self.step()
+            self.stepcount+=1
         print("Settings: ", self.x_old)
 
 initial = [
      100, #"neurons":
      -1, #"geneMin":
      1, #"geneMax":
-     5, #"popsize":
+     50, #"popsize":
      0.5, #"cxpb":
      0.2, #"mutpb":
-     5, #"ngens":
+     15, #"ngens":
      5, #"npools":
      0, #"mu":
      1, #"sigma":

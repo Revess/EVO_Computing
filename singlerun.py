@@ -81,7 +81,7 @@ if __name__ == "__main__":
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = (fit,)
 
-    for generation in range(ngens):#tqdm(range(ngens)):
+    for generation in tqdm(range(ngens)):
         with Pool(npools) as pool:
             offspring = list(map(toolbox.clone,toolbox.select(population, len(population))))
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
@@ -105,11 +105,10 @@ if __name__ == "__main__":
             for ind, fit in zip(invalid_ind, fitnesses):
                 ind.fitness.values = (fit,)
 
-        print("Replacing the population with the offspring")
         population[:] = offspring
-        print("Generation Avg:", np.mean([ind.fitness.values[0] for ind in population]))
-        print("Generation Min:", np.min([ind.fitness.values[0] for ind in population]))
-        print("Generation Max:", np.max([ind.fitness.values[0] for ind in population]))
+        print(" Generation Avg:", np.mean([ind.fitness.values[0] for ind in population]))
+        # print("Generation Min:", np.min([ind.fitness.values[0] for ind in population]))
+        # print("Generation Max:", np.max([ind.fitness.values[0] for ind in population]))
 
     fitnessPerGen = []
     playerPerGen = []
@@ -133,8 +132,6 @@ if __name__ == "__main__":
     if settings[13].split(":")[1].split()[0] == 'True':
         if not os.path.exists("./finetuning"):
             os.mkdir("./finetuning")
-        if not os.path.exists("./finetuning/"+settings[12].split(":")[1].split()[0]):
-            os.mkdir("./finetuning/"+settings[12].split(":")[1].split()[0])
 
     with open("./finetuning/"+settings[12].split(":")[1].split()[0]+".pkl","wb") as file_:
         pkl.dump([fitnessPerGen,playerPerGen,enemyPerGen,timePerGen], file_)
