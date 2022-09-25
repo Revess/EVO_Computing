@@ -1,5 +1,6 @@
 import sys, os
 sys.path.insert(0, 'evoman') 
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 settings = None
 with open("settings.txt", "r") as file_:
@@ -38,8 +39,8 @@ env = Environment(
     player_controller=player_controller(neurons)
 )
 
-geneMin = int(settings[1].split(":")[1].split()[0])
-geneMax = int(settings[2].split(":")[1].split()[0])
+# geneMin = int(settings[1].split(":")[1].split()[0])
+# geneMax = int(settings[2].split(":")[1].split()[0])
 ngenes = (env.get_num_sensors()+1) * neurons + (neurons + 1) * 5
 
 toolbox = base.Toolbox()

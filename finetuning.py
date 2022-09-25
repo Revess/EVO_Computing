@@ -23,7 +23,7 @@ class SA():
     def __init__(self, intial, std=0.1, T0=1 ,C=1,prefix=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
         self.namePrefix = prefix
         self.stepcount = 0
-        self.name_old = self.namePrefix + "_" + str(self.stepcount+1)
+        self.name_old = self.namePrefix + "_" + str(self.stepcount)
         self.T0 = T0
         self.std = np.array([
                 [33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -40,21 +40,27 @@ class SA():
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]])
         self.C = C
         self.t = 0
-        self.x_old = self.proposal(intial)
-        self.y_old = self.runSim(self.x_old, self.name_old)
+        self.x_old = intial
+        self.y_old = self.runSim(self.x_old.copy(), self.name_old)
 
     def proposal(self, x):
         name = self.namePrefix + "_" + str(self.stepcount+1)
         new_x = np.random.multivariate_normal(
             x,
             self.std
-        ), self.runSim(x, name), name
-        for index, x in enumerate(new_x):
-            if ((index == 4 or index == 5 or index == 8) and x > 1) or (x < 0 and index != 8):
-                    x = 1
-            elif x < 0 and (index == 4 or index == 5 or index == 8):
-                x = 0.1
-        return new_x
+        ).tolist()
+        x_new = []
+        for index, elem in enumerate(new_x):
+            if index == 0 or index == 3 or index == 6 or index == 7 or index == 11:
+                x_new.append(round(elem))
+            elif ((index == 4 or index == 5 or index == 8) and elem > 1) or (elem < 0 and index != 8):
+                x_new.append(1)
+            elif elem < 0 and (index == 4 or index == 5 or index == 8):
+                x_new.append(0.1)
+            else:
+                x_new.append(elem)
+        new_x = x_new.copy()
+        return new_x, self.runSim(new_x.copy(), name), name
         
     def runSim(self, x, name):
         x.append(name)
@@ -66,7 +72,8 @@ class SA():
         os.system("python singlerun.py")
         with open("./finetuning/"+name+".pkl", "rb") as file_:
             data = pd.DataFrame(pkl.load(file_)).T
-        return data[[0]].mean()
+        print(np.mean(data.iloc[:, 0].tolist()[-1]))
+        return np.mean(data.iloc[:, 0].tolist()[-1])
     
     def evaluate(self, y_new, y_old, T):
         A = y_new**(1/T)/y_old**(1/T)
@@ -82,7 +89,9 @@ class SA():
         T = (self.C*np.log(self.t+self.T0))**-1
         self.t = self.t+1
         x_prop, y_prop, name = self.proposal(self.x_old)
+        print(x_prop, y_prop, name)
         A = self.evaluate(y_prop, self.y_old, T)
+        print(A)
         self.select(x_prop, y_prop, name, A)
 
     def run(self, epochs):
