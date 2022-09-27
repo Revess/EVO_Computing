@@ -17,18 +17,13 @@ from deap import tools, base, creator
 import numpy as np
 from tqdm import tqdm
 import pickle as pkl
-from math import tanh
-import threading as td
+from math import tanh,isnan
 from multiprocessing import Pool
-from plotting import plot
-import pandas as pd
-from datetime import datetime
-from json import tool
 
 neurons = int(settings[0].split(":")[1].split()[0])
 env = Environment(
-    multiplemode="no",
-    enemies=[3],
+    multiplemode="yes",
+    enemies=[4,6,7],
     level=1,
     speed="fastest",
     sound="off",
@@ -39,9 +34,8 @@ env = Environment(
     player_controller=player_controller(neurons)
 )
 
-# geneMin = int(settings[1].split(":")[1].split()[0])
-# geneMax = int(settings[2].split(":")[1].split()[0])
 ngenes = (env.get_num_sensors()+1) * neurons + (neurons + 1) * 5
+continueTraining = False
 
 toolbox = base.Toolbox()
 creator.create("Fitness", base.Fitness, weights=(1.0,))      
@@ -59,7 +53,9 @@ else:
 
 def evaluate(individual):
     f,p,e,t = env.play(pcont=np.array(individual))
-    f = -tanh(365/(10**8) * (p**0.15) * (100 - e) * (t - 1000)) * (66-0.33*e) + 0.3*(p**0.15)*(100-e) 
+    # f = -tanh(365/(10**8) * (max(p,0)**0.15) * (100 - max(e,0)) * (t - 1000)) * (66-0.33*max(e,0)) + 0.3*(max(p,0)**0.15)*(100-max(e,0))
+    # if isnan(f):
+    #     f = 0
     return f,p,e,t
 
 toolbox.register("evaluate", evaluate)
@@ -72,7 +68,13 @@ if npools < 1:
     npools = 1
 if npools > popsize:
     npools = popsize
-population = toolbox.population(n=popsize)
+
+if not continueTraining:
+    population = toolbox.population(n=popsize)
+else:
+    population = None
+    with open("./populations/"+str(settings[12].split(":")[1].split()[0])+".pkl", "rb") as file_:
+        population = pkl.load(file_)
 
 
 dataPerGen = []
@@ -90,6 +92,7 @@ if __name__ == "__main__":
     for generation in tqdm(range(ngens)):
         with Pool(npools) as pool:
             offspring = list(map(toolbox.clone,toolbox.select(population, len(population))))
+            tempData = [dataPerGen[generation][[ind[0] for ind in dataPerGen[generation]].index(ind.fitness.values[0])] for ind in offspring]
             for child1, child2 in zip(offspring[::2], offspring[1::2]):
                 if random.random() < cxpb:
                     toolbox.mate(child1, child2)
@@ -103,7 +106,7 @@ if __name__ == "__main__":
                     del mutant.fitness.values
             
             invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-            tempData = [dataPerGen[generation][index] for index,ind in enumerate(offspring) if ind.fitness.valid]
+            tempData = [tempData[index] for index, ind in enumerate(offspring) if ind.fitness.valid]
             fitnesses = pool.map(toolbox.evaluate, invalid_ind)
             dataPerGen.append(tempData + fitnesses.copy())
             for index, fitness in enumerate(fitnesses):
@@ -113,6 +116,7 @@ if __name__ == "__main__":
 
         population[:] = offspring
         print(" Generation Avg:", np.mean([ind.fitness.values[0] for ind in population]))
+        print(" Generation Avg:", np.mean([ind[0] for ind in dataPerGen[generation+1]]))
         # print("Generation Min:", np.min([ind.fitness.values[0] for ind in population]))
         # print("Generation Max:", np.max([ind.fitness.values[0] for ind in population]))
 
@@ -141,3 +145,9 @@ if __name__ == "__main__":
 
     with open("./finetuning/"+str(settings[12].split(":")[1].split()[0])+".pkl","wb") as file_:
         pkl.dump([fitnessPerGen,playerPerGen,enemyPerGen,timePerGen], file_)
+    
+    if not os.path.exists("./populations"):
+        os.mkdir("./populations")
+
+    with open("./populations/"+str(settings[12].split(":")[1].split()[0])+".pkl","wb") as file_:
+        pkl.dump([ind for ind in population], file_)

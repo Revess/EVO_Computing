@@ -20,24 +20,21 @@ class SA():
     SETTINGNAMES = ["neurons: ","geneMin: ","geneMax: ","popsize: ","cxpb: ","mutpb: ","ngens: ","npools: ","mu: ","sigma: ","indpb: ","tournsize: ","name: ","finetuning: ", "tournament: "]
     USETOURNAMENT = True
 
-    def __init__(self, intial, std=0.1, T0=1 ,C=1,prefix=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
+    def __init__(self, intial, std=0.1, T0=1 ,C=0.1,prefix=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")):
         self.namePrefix = prefix
         self.stepcount = 0
         self.name_old = self.namePrefix + "_" + str(self.stepcount)
         self.T0 = T0
         self.std = np.array([
-                [33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]])
+                [33, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 33, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0.01, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0.01, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 5, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 3, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 3, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0.01, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 3]])
         self.C = C
         self.t = 0
         self.x_old = intial
@@ -52,12 +49,12 @@ class SA():
         ).tolist()
         x_new = []
         for index, elem in enumerate(new_x):
-            if index == 0 or index == 3 or index == 6 or index == 7 or index == 11:
-                x_new.append(round(elem))
-            elif ((index == 4 or index == 5 or index == 8) and elem > 1) or (elem < 0 and index != 8):
+            if index == 0 or index == 1 or index == 4 or index == 8:
+                elem = round(elem)
+            if ((index == 2 or index == 3 or index == 7) and elem > 1) or (elem < 0 and (index != 5 or index != 2 or index != 3 or index != 7)):
                 x_new.append(1)
-            elif elem < 0 and (index == 4 or index == 5 or index == 8):
-                x_new.append(0.1)
+            elif elem < 0 and (index == 2 or index == 3 or index == 7):
+                x_new.append(0.01)
             else:
                 x_new.append(elem)
         new_x = x_new.copy()
@@ -67,14 +64,17 @@ class SA():
         x.append(name)
         x.append("True")
         x.append(self.USETOURNAMENT)
+        x.insert(1,-1)
+        x.insert(2, 1)
+        x.insert(7,20)
+        print(x)
         x = [self.SETTINGNAMES[index]+str(s)+"\n" for index, s in enumerate(x)]
         with open("settings.txt", "w") as file_:
             file_.writelines(x)
         os.system("python singlerun.py")
         with open("./finetuning/"+name+".pkl", "rb") as file_:
             data = pd.DataFrame(pkl.load(file_)).T
-        print(np.mean(data.iloc[:, 0].tolist()[-1]))
-        return np.mean(data.iloc[:, 0].tolist()[-1])
+        return 100-np.mean(data.iloc[:, 0].tolist()[-1])
     
     def evaluate(self, y_new, y_old, T):
         A = y_new**(1/T)/y_old**(1/T)
@@ -95,7 +95,7 @@ class SA():
 
     def run(self, epochs):
         for epoch in range(epochs):
-            print("Epoch: ",epoch+1, "Fitness: ", self.y_old)
+            print("Epoch: ",epoch+1, "Fitness: ", 100-self.y_old)
             self.step()
             self.stepcount+=1
             self.history.append(self.x_old)
@@ -106,18 +106,15 @@ class SA():
 
 initial = [
      100, #"neurons":   std: 33
-     -1, #"geneMin":    std: 0.1
-     1, #"geneMax":     std: 0.1
      50, #"popsize":    std: 33
      0.5, #"cxpb":      std: 0.01
      0.2, #"mutpb":     std: 0.01
      15, #"ngens":      std: 5
-     5, #"npools":      std: 33
      0, #"mu":          std: 3
      1, #"sigma":       std: 3
      0.1, #"indpb":     std: 0.01
      3, #"tournsize":   std: 3
 ]
 
-sa = SA(initial)
-sa.run(50)
+sa = SA(initial, T0=10, C=0.5)
+sa.run(10)

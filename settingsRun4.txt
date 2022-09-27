@@ -1,0 +1,15 @@
+neurons: 150
+geneMin: -1
+geneMax: 1
+popsize: 50
+cxpb: 0.6
+mutpb: 0.025
+ngens: 30
+npools: 20
+mu: 0
+sigma: 1
+indpb: 0.1
+tournsize: 10
+name: Run4
+finetuning: True
+tournament: False
