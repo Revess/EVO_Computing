@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 
 f,p,e,t = [None]*4
-with open("./finetuning/" + os.listdir("./finetuning")[len(os.listdir("./finetuning"))-1], "rb") as file_:
+with open("./finetuning/Run2.pkl", "rb") as file_:
     f,p,e,t = pkl.load(file_)
 
 folderpath = "./plots/"

@@ -67,6 +67,7 @@ class SA():
         x.insert(1,-1)
         x.insert(2, 1)
         x.insert(7,20)
+        x[6] = 20
         print(x)
         x = [self.SETTINGNAMES[index]+str(s)+"\n" for index, s in enumerate(x)]
         with open("settings.txt", "w") as file_:
@@ -109,7 +110,7 @@ initial = [
      50, #"popsize":    std: 33
      0.5, #"cxpb":      std: 0.01
      0.2, #"mutpb":     std: 0.01
-     15, #"ngens":      std: 5
+     20, #"ngens":      std: 5
      0, #"mu":          std: 3
      1, #"sigma":       std: 3
      0.1, #"indpb":     std: 0.01
