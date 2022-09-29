@@ -21,6 +21,6 @@ fitness_df = fitness_df.sort_values(['variable','individual'])
 fitness_df = fitness_df.reset_index(drop=True)
 fitness_df = fitness_df.rename(columns={'variable':'generation', 'value':'fitness value'})
 
-fitness_df.to_excel(filepath)
+#fitness_df.to_excel(filepath)
 
 plot()
