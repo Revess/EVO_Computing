@@ -42,4 +42,4 @@ for evo in range(2):
             df.to_csv("./dataBackup/"+name+".csv",index=False)
 
 df = pd.DataFrame.from_dict(listOfLists)
-df.to_csv("./finalData.csv",index=False)
+df.to_csv("./trainingResults.csv",index=False)

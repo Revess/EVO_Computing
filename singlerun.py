@@ -53,10 +53,10 @@ else:
 
 def evaluate(individual):
     f,p,e,t = env.play(pcont=np.array(individual))
-    f = -tanh(365/(10**8) * (max(p,0)**0.15) * (100 - max(e,0)) * (t - 1000)) * (66-0.33*max(e,0)) + 0.3*(max(p,0)**0.15)*(100-max(e,0))
+    # f = -tanh(365/(10**8) * (max(p,0)**0.15) * (100 - max(e,0)) * (t - 1000)) * (66-0.33*max(e,0)) + 0.3*(max(p,0)**0.15)*(100-max(e,0))
     # f = -tanh(365/(10**7.7) * (max(p,0)**0.15) * (100 - max(e,0)) * (t - 1500)) * 50 + (50*((p**0.15)/2)*((100-e)/100))
-    if isnan(f):
-        f = 0
+    # if isnan(f):
+        # f = 0
     return f,p,e,t
 
 toolbox.register("evaluate", evaluate)

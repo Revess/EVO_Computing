@@ -1,7 +1,7 @@
 deap
 pandas
 numpy
-pickle
+pickle-mixin
 pygame
 tqdm
 matplotlib

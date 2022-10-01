@@ -13,7 +13,7 @@ from tqdm import tqdm
 creator.create("Fitness", base.Fitness, weights=(1.0,))      
 creator.create("IndividualContainer", list, fitness=creator.Fitness)
 
-df = pd.read_csv("./trainingResults.csv")
+df = pd.read_csv("./trainingResultsBaseline.csv")
 
 bestEnemy2E1 = [0]*10
 bestEnemy5E1 = [0]*10
