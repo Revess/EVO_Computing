@@ -99,7 +99,7 @@ for run in tqdm(allRuns.keys()):
             Outcomes["evo"].append(run.split("_")[0])
             Outcomes["enemy"].append(run.split("_")[-1])
             Outcomes["individual"].append(index)
-            Outcomes["round"].append(index)
+            Outcomes["round"].append(round)
             Outcomes["f"].append(f)
             Outcomes["p"].append(p)
             Outcomes["e"].append(e)
