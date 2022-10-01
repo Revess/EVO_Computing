@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 
 # Train results
@@ -97,6 +99,45 @@ def get_test_boxplot(data_frame):
     plt.title('Boxplot of gain score per EA method')
     plt.xlabel('EA method')
     plt.ylabel('Gain score')
+
+
+def bas_alt_mutation(alternative, baseline):
+    testres_alt = alternative
+    testres_alt = testres_alt[testres_alt.p != 0].groupby(['evo', 'enemy', 'individual', 'round'],as_index=False).mean()
+
+    testres_bas = baseline
+    testres_bas = testres_bas[testres_bas.p != 0].groupby(['evo', 'enemy', 'individual', 'round'],as_index=False).mean()
+
+    return testres_alt, testres_bas
+
+def get_bas_alt_scatter(alt_df, base_df):
+    testres_alt, testres_bas = bas_alt_mutation(alt_df, base_df)
+    plt.scatter(testres_alt.t, testres_alt.p, c = 'blue', label = 'Alternative fitness')
+    plt.scatter(testres_bas.t,testres_bas.p, c = 'red', label = 'Baseline fitness')
+    plt.title('Different fitness functions tested against \n the player health vs the victory time')
+    plt.xlabel('Victory time')
+    plt.ylabel('Player health left')
+    plt.legend()
+
+def get_bas_alt_ph_boxplot(alt_df, base_df):
+    testres_alt, testres_bas = bas_alt_mutation(alt_df, base_df)
+    player_health = pd.concat([pd.DataFrame(testres_bas.p), pd.DataFrame(testres_alt.p)], axis = 1, keys = ['baseline','alternative'])
+    player_health.columns = ['Baseline player health','Alternative player health']
+
+    sns.boxplot(player_health, width=0.3)
+    plt.title('Distribution of the player health left')
+    plt.ylabel('Player health left')
+    plt.xlabel('Fitness function')
+
+def get_bas_alt_vt_boxplot(alt_df, base_df):
+    testres_alt, testres_bas = bas_alt_mutation(alt_df, base_df)
+    victory_time = pd.concat([pd.DataFrame(testres_bas.t), pd.DataFrame(testres_alt.t)], axis = 1, keys = ['baseline','alternative'])
+    victory_time.columns = ['Baseline victory time','Alternative victory time']
+    sns.boxplot(victory_time, width=0.3)
+    plt.title('Distribution of the victory time')
+    plt.ylabel('Victory time')
+    plt.xlabel('Fitness function')
+
 
 
 

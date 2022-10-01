@@ -1,10 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from plot_functions import get_train_plot
-from plot_functions import get_test_boxplot
+import plot_functions as pf
 
 # Training results
-trainres = pd.read_csv('trainingResults.csv')
+trainres = pd.read_csv('trainingResultsAltFitness.csv')
 fig, ax = plt.subplots(2,3)
 fig.suptitle('Fitness values over generations per enemy per EA-method', x =0.5, y = 0.94)
 for i in range(2):
@@ -20,7 +19,7 @@ for i in range(2):
         elif j == 2:
             en = 8
 
-        get_train_plot(data_frame=trainres, enemy_number=en,evo_number=ev, ax=ax[i][j])
+        pf.get_train_plot(data_frame=trainres, enemy_number=en,evo_number=ev, ax=ax[i][j])
 
 # Save plot
 plt.tight_layout()
@@ -30,7 +29,21 @@ plt.show()
 #plt.savefig('Fitness over gen per enemy per EA.jpg')
 
 # Test plot
-testres = pd.read_csv('testRestults.csv')
-get_test_boxplot(testres)
+testres = pd.read_csv('testRestultsAltFitness.csv')
+pf.get_test_boxplot(testres)
 plt.show()
-plt.savefig('Boxplot of gain score per EA method.jpg')
+#plt.savefig('Boxplot of gain score per EA method.jpg')
+
+# Baseline comparison
+testres_bas = pd.read_csv('testRestultsBaseline.csv')
+pf.get_bas_alt_scatter(alt_df=testres, base_df=testres_bas)
+plt.show()
+#plt.savefig('Scatterplot of fitness functions.jpg')
+
+pf.get_bas_alt_ph_boxplot(alt_df=testres, base_df=testres_bas)
+plt.show()
+#plt.savefig('Boxplot of player health fitness functions.jpg')
+
+pf.get_bas_alt_vt_boxplot(alt_df=testres, base_df=testres_bas)
+plt.show()
+#plt.savefig('Boxplot of victory time fitness functions.jpg')
