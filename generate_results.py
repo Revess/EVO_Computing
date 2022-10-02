@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import plot_functions as pf
+import seaborn as sns
 
 # Training results
 trainres = pd.read_csv('trainingResultsAltFitness.csv')
@@ -29,6 +30,7 @@ plt.show()
 #plt.savefig('Fitness over gen per enemy per EA.jpg')
 
 # Test plot
+sns.set(font_scale = 1.2)
 testres = pd.read_csv('testRestultsAltFitness.csv')
 pf.get_test_boxplot(testres)
 plt.show()
