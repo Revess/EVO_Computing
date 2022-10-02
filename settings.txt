@@ -10,7 +10,7 @@ mu: 0
 sigma: 1
 indpb: 0.1
 tournsize: 3
-name: 0_8_9
+name: 0_2_0
 finetuning: True
-tournament: False
-enemy: 8
+tournament: True
+enemy: 2
