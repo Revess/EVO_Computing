@@ -38,3 +38,5 @@ And finally to generate some fun plots run generateResults.py
 Inside ./src there are some backend files and a statistical test notebook to see similarity between the baseline fitness and our custom 
 function.
 Finally there is the ./data folder, here the populations and fitnessvalues will be dumped. There you can also find our results for our four trained EA, the AltFitness files and folders are the custom fitness EA and the baseline are the given fitness EA.
+
+For more workflow items etc see our GIT: https://github.com/Revess/EVO_Computing
