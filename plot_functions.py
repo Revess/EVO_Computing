@@ -93,9 +93,7 @@ def get_test_boxplot(data_frame):
 
     gain_df['gain'] = gain_df['gain'].astype('float')
     gain_wide = gain_df.pivot(index='run', columns='ea', values='gain')
-    #gain_wide = gain_wide.rename(columns = {'0':labels=['Tournament','Roulette']})
     gain_wide.columns = ['Tournament','Roulette']
-    #plt.boxplot(gain_wide, labels=['Tournament','Roulette'])
     sns.boxplot(gain_wide, width=0.3)
     plt.title('Boxplot of gain score per EA method')
     plt.xlabel('EA method')

@@ -22,30 +22,31 @@ for i in range(2):
 
         pf.get_train_plot(data_frame=trainres, enemy_number=en,evo_number=ev, ax=ax[i][j])
 
-# Save plot
 plt.tight_layout()
 fig.legend()
 fig.set_size_inches(10,6)
 plt.show()
-#plt.savefig('Fitness over gen per enemy per EA.jpg')
+#plt.savefig('Fitness over gen per enemy per EA.jpg') #Uncomment and comment plt.show() to save an image of the plot
 
-# Test plot
+# Testing plots
+
+# Gain results
 sns.set(font_scale = 1.2, style = 'ticks')
 testres = pd.read_csv('testRestultsAltFitness.csv')
 pf.get_test_boxplot(testres)
 plt.show()
-#plt.savefig('Boxplot of gain score per EA method.jpg')
+#plt.savefig('Boxplot of gain score per EA method.jpg') #Uncomment and comment plt.show() to save an image of the plot
 
 # Baseline comparison
 testres_bas = pd.read_csv('testRestultsBaseline.csv')
 pf.get_bas_alt_scatter(alt_df=testres, base_df=testres_bas)
 plt.show()
-#plt.savefig('Scatterplot of fitness functions.jpg')
+#plt.savefig('Scatterplot of fitness functions.jpg') #Uncomment and comment plt.show() to save an image of the plot
 
 pf.get_bas_alt_ph_boxplot(alt_df=testres, base_df=testres_bas)
 plt.show()
-#plt.savefig('Boxplot of player health fitness functions.jpg')
+#plt.savefig('Boxplot of player health fitness functions.jpg') #Uncomment and comment plt.show() to save an image of the plot
 
 pf.get_bas_alt_vt_boxplot(alt_df=testres, base_df=testres_bas)
 plt.show()
-#plt.savefig('Boxplot of victory time fitness functions.jpg')
+#plt.savefig('Boxplot of victory time fitness functions.jpg') #Uncomment and comment plt.show() to save an image of the plot
