@@ -30,7 +30,7 @@ plt.show()
 #plt.savefig('Fitness over gen per enemy per EA.jpg')
 
 # Test plot
-sns.set(font_scale = 1.2)
+sns.set(font_scale = 1.2, style = 'ticks')
 testres = pd.read_csv('testRestultsAltFitness.csv')
 pf.get_test_boxplot(testres)
 plt.show()
