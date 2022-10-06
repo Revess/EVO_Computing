@@ -1,7 +1,7 @@
-neurons: 100
+neurons: 10
 geneMin: -1
 geneMax: 1
-popsize: 100
+popsize: 20
 cxpb: 0.5
 mutpb: 0.3
 ngens: 20

@@ -28,8 +28,8 @@ from multiprocessing import Pool
 ##Set the neurons and the enviroment
 neurons = int(settings[0].split(":")[1].split()[0])
 env = Environment(
-    multiplemode="no",
-    enemies=[int(settings[15].split(":")[1].split()[0])],
+    multiplemode="yes",
+    enemies=[1,2,3],
     level=2,
     speed="fastest",
     sound="off",
