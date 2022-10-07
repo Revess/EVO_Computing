@@ -1,0 +1,26 @@
+{
+    "name": "0Init",
+    "EA": 1,
+    "mode": "train",
+    "settings": {
+        "popSize": 50,
+        "popInit": "random",
+        "cxType": "xx",
+        "cxpb": 0.5,
+        "mutType": "xx",
+        "mutpb": 0.3,
+        "selType": "tournament",
+        "tournamentSize": 3,
+        "ngens": 20
+    },
+    "enemies": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+    ]
+}
