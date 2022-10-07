@@ -20,6 +20,7 @@ if not os.path.exists("./data/trainedPopulations/specialists"):
 
 if not os.path.exists("./data/checkpoints"):
     os.mkdir("./data/checkpoints")
+    
 if not os.path.exists("./data/checkpoints/" + settings["name"]):
     os.mkdir("./data/checkpoints/" + settings["name"])
 
@@ -111,7 +112,6 @@ if __name__ == "__main__":
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
-            index+=2
 
         for index, mutant in enumerate(offspring):
             if random.random() < mutpb:

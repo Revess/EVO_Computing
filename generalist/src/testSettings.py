@@ -1,9 +1,8 @@
 import os
 def testSettings(settings):
-    name = settings["name"].split("_")
-    assert len(name) == 4 and int(name[0]) > 0 and int(name[0]) < 3 and int(name[1]) > 0 and int(name[1]) < 3 and (name[2] == "S" or name[2] == "R") and int(name[0]) >= 0
-    assert settings["EA"] == 1 or settings["EA"] == 2
-    assert settings["mode"] == "train" or settings["mode"] == "test"
+    # name = settings["name"].split("_")
+    # print(name)
+    # assert (len(name) == 4 and int(name[0]) > 0 and int(name[0]) < 3 and int(name[1]) > 0 and int(name[1]) < 3 and (name[2] == "S" or name[2] == "R") and int(name[0]) >= 0) or (len(name) == 3 and name[0] == "S" and int(name[1]) > 0 and int(name[1]) <= 8 and int(name[2]) > 0 )
     assert settings["settings"]["popSize"] > 0
     assert settings["settings"]["popInit"] == "random" or os.path.exists(settings["settings"]["popInit"])
     assert settings["settings"]["cxType"] =="xx"
