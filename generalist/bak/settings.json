@@ -172,7 +172,7 @@
         "settings": {
             "popSize": 100,
             "popInit": "random",
-            "cxpb": 0.7,
+            "cxpb": 0.5,
             "mutpb": 0.4,
             "selType": "tournament",
             "tournamentSize": 3,
@@ -194,7 +194,7 @@
         "settings": {
             "popSize": 100,
             "popInit": "random",
-            "cxpb": 0.7,
+            "cxpb": 0.5,
             "mutpb": 0.4,
             "selType": "roulette",
             "tournamentSize": 3,
