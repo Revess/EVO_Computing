@@ -60,9 +60,9 @@ for eaRun, setting in enumerate(settings):
         for enemy in range(1,9):
             for rnd in range(args.rnd):
                 if "1" in args.ea:
-                    setting["name"] = "S1_" + str(enemy+1) + "_" + str(rnd)
+                    setting["name"] = "S1_" + str(enemy) + "_" + str(rnd)
                 elif "2" in args.ea:
-                    setting["name"] = "S2_" + str(enemy+1) + "_" + str(rnd)
+                    setting["name"] = "S2_" + str(enemy) + "_" + str(rnd)
                 else:
                     setting["name"] = "S"+str(eaRun+1)+"_" + str(enemy) + "_" + str(rnd)
                 setting["enemies"] = [enemy]
