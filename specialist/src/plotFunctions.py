@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Train results
-def get_train_plot(data_frame, enemy_number, evo_number, ax):
+def get_train_plot(data_frame, enemy_number, evo_number):
     enemy = data_frame[data_frame.enemy == enemy_number]
     enemy = enemy[enemy.evo == evo_number]
 
@@ -34,6 +34,8 @@ def get_train_plot(data_frame, enemy_number, evo_number, ax):
     else:
         evo_tit = 'Error: unknown method'
     title = 'Enemy ' + str(enemy_number) + ', ' + evo_tit
+    
+    '''
     if enemy_number == 2 and evo_number:
         ax.plot(df_max_results.index, df_max_results.fitness, 'ro', label='mean of maxs')
     else:
@@ -41,7 +43,9 @@ def get_train_plot(data_frame, enemy_number, evo_number, ax):
     ax.plot(df_max_results.index, df_max_results.fitness, 'r-')
     ax.fill_between(df_max_results.index, df_max_results.fitness - df_max_results.max_std,
                     df_max_results.fitness + df_max_results.max_std, color='red', alpha=0.1)
+    #'''
 
+    ''' AX
     # Mean plot
     if enemy_number == 2 and evo_number:
         ax.plot(df_mean_results.index, df_mean_results.fitness, 'o', label='mean of means')
@@ -61,6 +65,32 @@ def get_train_plot(data_frame, enemy_number, evo_number, ax):
         ax.set_xlabel('Generation')
     else:
         ax.set_xlabel('Generation')
+        
+    '''
+    # PLT
+    print(df_mean_results.fitness)
+    if enemy_number == 2 and evo_number:
+        plt.plot(df_mean_results.index, df_mean_results.fitness, 'o', label='mean of means')
+    else:
+        plt.plot(df_mean_results.index, df_mean_results.fitness, 'o')
+    plt.plot(df_mean_results.index, df_mean_results.fitness, 'b-')
+    plt.fill_between(df_mean_results.index, df_mean_results.fitness - df_mean_results.mean_std,
+                    df_mean_results.fitness + df_mean_results.mean_std, color='blue', alpha=0.1)
+    
+    return plt
+
+    '''
+    plt.set_xticks(ticks=range(0, 21, 2))
+    plt.set_title(title)
+    if enemy_number == 2:
+        plt.set_ylabel('Fitness value')
+    else:
+        plt.set_ylabel('Fitness value')
+    if evo_number == 1:
+        plt.set_xlabel('Generation')
+    else:
+        plt.set_xlabel('Generation')
+        '''
 
 # Test results
 #EA 0
