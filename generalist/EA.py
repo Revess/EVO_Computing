@@ -125,7 +125,7 @@ class EA():
         
         for generation in tqdm(range(self.settings["settings"]["ngens"])):
             self.generation(generation)
-            self.cxpb -= (generation * self.cxpbStep)
+            self.cxpb = self.settings["settings"]["cxpb"] - (generation * self.cxpbStep)
             self.mutpb = 0.2 + (generation * self.mutpbStep)
 
         self.terminate()
