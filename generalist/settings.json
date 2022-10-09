@@ -175,8 +175,8 @@
             "cxpb": 0.7,
             "mutpb": 0.4,
             "selType": "tournament",
-            "tournamentSize": 3,
-            "ngens": 40
+            "tournamentSize": 5,
+            "ngens": 20
         },
         "enemies": [
             1,
@@ -198,7 +198,7 @@
             "mutpb": 0.4,
             "selType": "roulette",
             "tournamentSize": 3,
-            "ngens": 40
+            "ngens": 20
         },
         "enemies": [
             1,
