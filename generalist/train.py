@@ -85,12 +85,12 @@ for eaRun, setting in enumerate(settings):
                         eaName = str(eaRun+1)
                     settingSub["name"] = eaName + "_" + group + "_" + type_ + "_" + str(rnd)
                     if type_ == "S":
-                        print("Running on size:", round(settingSub["settings"]["popSize"]/len(settingSub["enemies"]))*len(settingSub["enemies"]))
-                        settingSub["settings"]["popSize"] = round(settingSub["settings"]["popSize"]/len(settingSub["enemies"]))*len(settingSub["enemies"])
+                        print("Running on enemy size:", round((settingSub["settings"]["popSize"]*(1-settingSub["Noise"]))/len(settingSub["enemies"]))*len(settingSub["enemies"]))
+                        # settingSub["settings"]["popSize"] = round((settingSub["settings"]["popSize"]*(1-settingSub["Noise"]))/len(settingSub["enemies"]))*len(settingSub["enemies"])
                         trainedSpec = pd.read_csv("./data/CSV/trainingSpecialists.csv")
                         population = []
                         for enemy in settingSub["enemies"]:
-                            for rowNR, candidate in trainedSpec.loc[(trainedSpec["EA"] == int(eaName)) & (trainedSpec["Enemy"] == enemy)].nlargest(int(settingSub["settings"]["popSize"]/len(settingSub["enemies"])),"Fitness").iterrows():
+                            for rowNR, candidate in trainedSpec.loc[(trainedSpec["EA"] == int(eaName)) & (trainedSpec["Enemy"] == enemy)].nlargest(int(round((settingSub["settings"]["popSize"]*(1-settingSub["Noise"]))/len(settingSub["enemies"]))*len(settingSub["enemies"])/len(settingSub["enemies"])),"Fitness").iterrows():
                                 population.append(["S" + str(int(candidate["EA"])) + "_" + str(int(candidate["Enemy"])) + "_" + str(int(candidate["Round"])) + "/" + str(int(candidate["Generation"])) + ".pkl", str(int(candidate["Individual"]))])
                         settingSub["settings"]["popInit"] = population
                     else:

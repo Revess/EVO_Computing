@@ -65,8 +65,8 @@ class EA():
             self.popsize = self.settings["settings"]["popSize"]
             self.population = self.toolbox.population(n=self.popsize)
         elif type(self.settings["settings"]["popInit"]) == type([]):
-            self.popNoise = (self.settings["settings"]["popSize"]*(1+self.settings["Noise"]))-self.settings["settings"]["popSize"]
-            self.popsize = self.settings["settings"]["popSize"]+self.popNoise
+            self.popNoise = self.settings["settings"]["popSize"] - round((self.settings["settings"]["popSize"]*(1-self.settings["Noise"]))/len(self.settings["enemies"]))*len(self.settings["enemies"])
+            self.popsize = self.settings["settings"]["popSize"]
             self.population = []
             for candidate in self.settings["settings"]["popInit"]:
                 with open("./data/checkpoints/"+candidate[0], "rb") as cp:
