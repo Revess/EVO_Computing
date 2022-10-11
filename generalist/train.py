@@ -57,7 +57,7 @@ else:
 
 for eaRun, setting in enumerate(settings):
     if "Specialists" in args.ea or args.ea == "bothSE":
-        for enemy in range(1,9):
+        for enemy in range(1,2):
             for rnd in range(args.rnd):
                 if "1" in args.ea:
                     setting["name"] = "S1_" + str(enemy) + "_" + str(rnd)

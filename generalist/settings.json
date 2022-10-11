@@ -3,7 +3,7 @@
         "S_1": {
             "name": "1_1_S_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
                 "cxpb": 0.5,
                 "mutpb": 0.4,
@@ -44,7 +44,7 @@
         "R_1": {
             "name": "1_1_R_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
                 "cxpb": 0.5,
                 "mutpb": 0.4,
@@ -87,7 +87,7 @@
         "S_1": {
             "name": "2_1_S_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
                 "cxpb": 0.5,
                 "mutpb": 0.4,
@@ -128,7 +128,7 @@
         "R_1": {
             "name": "2_1_R_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
                 "cxpb": 0.5,
                 "mutpb": 0.4,
