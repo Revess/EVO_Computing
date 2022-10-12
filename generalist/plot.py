@@ -1,50 +1,46 @@
-#from tkinter.tix import COLUMN
-from unittest import result
+# Imports
 import pandas as pd
 import matplotlib.pyplot as plt
-import src.plotFunctions as pf
-import numpy as np
+import seaborn as sns
+import os
 
-folder = "./data/CSV/"
-file = "trainingSpecialists.csv"
+# Variables
+top = 750
+folderCSV = "./data/CSV/"
+fileCSV = "trainingSpecialists.csv"
+folderOutput = "./plots/"
+fileOutput = folderOutput + "top_{top}_specialists_per_enemy_boxplot.png".format(top=top)
+duplicates_to_drop = "Fitness"
 
-trainres = pd.read_csv(folder + file)
+# Function(s)
+def make_plot(df):
+    indexes = []
+    df.reset_index(inplace=True)
 
-x_label = "Enemy"
-y_label = "Fitness"
-enemies = 5
-EA = 1
-top = 50
-trainres = trainres[trainres["EA"] == EA].drop("EA", axis=1)
-
-lowest_fitness = 100
-highest_fitness = 0
-averages = [0 for a in range(1, 1 + enemies, 1)]
-print(averages)
-for x in range(1, 1 + enemies, 1):
-    temptrainres = trainres[trainres["Enemy"] == x]
-    best = temptrainres["Fitness"].drop_duplicates().sort_values(ascending=False)[0:top]
-    to_plot = temptrainres.loc[best.index]
-    min_value = to_plot.iloc[top - 1]["Fitness"]
-    max_value = to_plot.iloc[0]["Fitness"]
-
-    if lowest_fitness > min_value:
-        lowest_fitness = min_value
-    if highest_fitness < max_value:
-        highest_fitness = max_value
+    # Find the fittest members of each EA and Enemy (Prepare the DataFrame)
+    for EA_nr in range(1,3):
+        for enem in range(1,9):
+            perenemy = df.loc[(df["Enemy"] == enem)&(df["EA"] == EA_nr)]
+            sorted = perenemy.sort_values(by="Fitness", ascending=True).drop_duplicates(duplicates_to_drop, keep='last')[-top:]
+            for i, r in sorted.iterrows():
+                indexes.append(i)
     
-    mean = to_plot["Fitness"].mean()
-    averages[x - 1] = mean
-    
-    plt.boxplot(to_plot["Fitness"], positions=[x])
-    plt.scatter(to_plot[x_label], to_plot[y_label], label = x_label + str(x), alpha=0.3)
-    
+    # Rename the column EA for the legend
+    df['EA'] = df['EA'].replace([1],'Tournament')
+    df['EA'] = df['EA'].replace([2],'Roulette')
 
-plt.plot(range(1, 1 + enemies, 1), averages, alpha=0.9, label="Average")
-plt.title("Comparison of top {k} specialists by enemy".format(k=top))
-plt.xlabel(x_label)
-plt.ylabel(y_label)
-plt.ylim(lowest_fitness - 0.5, highest_fitness + 0.5)
-plt.xlim(1-0.5, enemies + 0.5)
-plt.legend()
-plt.show()
+    # Create the boxplot
+    sns.boxplot(data=df.loc[df["index"].isin(indexes)], x="Enemy", y="Fitness", hue="EA", width=0.6)
+    plt.title("Comparison of top {k} specialists by enemy".format(k=top))
+    plt.savefig(fileOutput, dpi=800)
+    print("Saved the boxplot to: " + str(fileOutput))
+
+# Retrieve the dataframe
+trainres = pd.read_csv(folderCSV + fileCSV)
+
+# Create the folder if not exists
+if not os.path.exists(folderOutput):
+    os.makedirs(folderOutput)
+
+# Make the plot
+make_plot(trainres)
