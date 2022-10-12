@@ -43,7 +43,7 @@ if "Specialists" in args.ea or args.ea == "bothSE":
     elif args.ea == "bothSE":
         sEAs = [1,2]
 
-    trainingData = pd.read_csv("./data/CSV/trainingSpecialists.csv")
+    trainingData = pd.read_csv("./data/CSV/trainingSpecialists.csv").sort_values("Fitness", ascending=False).drop_duplicates('ids')
     testScores = { "EA": [], "Enemy": [], "Training Round": [], "Generation": [], "Individual": [], "Testing Round": [], "Fitness": [], "Player Health": [], "Enemy Health": [], "Time": [], "Weights": [] }
     for Sea in sEAs:
         for enemy in range(1,9):
@@ -106,7 +106,7 @@ else:
         eas = [1]
     elif args.ea == "EA2":
         eas = [2]
-    elif args.ea == "both":
+    elif args.ea == "bothEA":
         eas = [1,  2]
     if args.type == "all":
         types = ["S", "R"]
@@ -131,7 +131,7 @@ else:
                         for r in tqdm(range(args.rnd)):
                             env = Environment(
                                 multiplemode="yes",
-                                enemies=enemies,
+                                enemies=[1,2,3,4,5,6,7,8],
                                 level=2,
                                 speed=SPEED,
                                 sound="off",
@@ -156,7 +156,7 @@ else:
                             testScores["Time"].append(t)
                             testScores["Weights"].append(player)
     if len(testScores["EA"]) > 0:
-        if len(eaRun) > 1:
+        if len(eas) > 1:
             pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
         else: 
             if os.path.exists("./data/CSV/testScoresGeneralists.csv"):

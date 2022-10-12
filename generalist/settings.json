@@ -5,7 +5,7 @@
             "settings": {
                 "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "tournament",
                 "tournamentSize": 3,
@@ -26,18 +26,19 @@
         "S_2": {
             "name": "1_2_S_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "tournament",
                 "tournamentSize": 3,
                 "ngens": 20
             },
             "enemies": [
-                1,
-                2,
-                3
+                3,
+                5,
+                7,
+                8
             ],
             "Noise": 0
         },
@@ -46,7 +47,7 @@
             "settings": {
                 "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "tournament",
                 "tournamentSize": 3,
@@ -67,18 +68,19 @@
         "R_2": {
             "name": "1_2_S_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "tournament",
                 "tournamentSize": 3,
                 "ngens": 20
             },
             "enemies": [
-                1,
-                2,
-                3
+                3,
+                5,
+                7,
+                8
             ],
             "Noise": 0
         }
@@ -89,7 +91,7 @@
             "settings": {
                 "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "roulette",
                 "tournamentSize": 3,
@@ -110,18 +112,19 @@
         "S_2": {
             "name": "1_2_S_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "roulette",
                 "tournamentSize": 3,
                 "ngens": 20
             },
             "enemies": [
-                1,
-                2,
-                3
+                3,
+                5,
+                7,
+                8
             ],
             "Noise": 0
         },
@@ -130,7 +133,7 @@
             "settings": {
                 "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "roulette",
                 "tournamentSize": 3,
@@ -151,18 +154,19 @@
         "R_2": {
             "name": "2_2_S_0",
             "settings": {
-                "popSize": 5,
+                "popSize": 96,
                 "popInit": "random",
-                "cxpb": 0.5,
+                "cxpb": 0.7,
                 "mutpb": 0.4,
                 "selType": "roulette",
                 "tournamentSize": 3,
                 "ngens": 20
             },
             "enemies": [
-                1,
-                2,
-                3
+                3,
+                5,
+                7,
+                8
             ],
             "Noise": 0
         }

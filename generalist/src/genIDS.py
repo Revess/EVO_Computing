@@ -21,7 +21,7 @@ creator.create("Fitness", base.Fitness, weights=(1.0,))
 creator.create("IndividualContainer", list, fitness=creator.Fitness)
 
 # %%
-df = pd.read_csv("./data/CSV/trainingSpecialists.csv").sort_values(["EA","Enemy","Round","Generation","Individual"])
+df = pd.read_csv("../data/CSV/trainingSpecialists.csv").sort_values(["EA","Enemy","Round","Generation","Individual"])
 ids = [0]*df.shape[0]
 weights = [0]*df.shape[0]
 passedWeights = [0]*df.shape[0]
@@ -35,7 +35,7 @@ with tqdm(total=df.shape[0]) as iterator:
             for rnd in range(10):
                 for generation in range(21):
                     row = df.loc[(df["EA"] == ea)&(df["Enemy"] == enemy)&(df["Round"] == rnd)&(df["Generation"] == generation) &(df["Individual"] == 0)]
-                    with open("./data/checkpoints/S"+ str(int(row["EA"])) + "_" + str(int(row["Enemy"])) + "_" + str(int(row["Round"])) + "/" + str(int(row["Generation"])) + ".pkl","rb") as file_:
+                    with open("../data/checkpoints/S"+ str(int(row["EA"])) + "_" + str(int(row["Enemy"])) + "_" + str(int(row["Round"])) + "/" + str(int(row["Generation"])) + ".pkl","rb") as file_:
                         pop = pkl.load(file_)[0]
                     for individual in range(100):
                         weight = pop[individual]
@@ -55,7 +55,7 @@ with tqdm(total=df.shape[0]) as iterator:
                         index+=1
 
 # %%
-with open("./ids.pkl", "wb") as file_:
+with open("../ids.pkl", "wb") as file_:
     pkl.dump(ids,file_)
 
 

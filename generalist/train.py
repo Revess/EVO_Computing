@@ -87,7 +87,7 @@ for eaRun, setting in enumerate(settings):
                     if type_ == "S":
                         print("Running on enemy size:", round((settingSub["settings"]["popSize"]*(1-settingSub["Noise"]))/len(settingSub["enemies"]))*len(settingSub["enemies"]))
                         # settingSub["settings"]["popSize"] = round((settingSub["settings"]["popSize"]*(1-settingSub["Noise"]))/len(settingSub["enemies"]))*len(settingSub["enemies"])
-                        trainedSpec = pd.read_csv("./data/CSV/trainingSpecialists.csv")
+                        trainedSpec = pd.read_csv("./data/CSV/trainingSpecialists.csv").sort_values("Fitness", ascending=False).drop_duplicates('ids')
                         population = []
                         for enemy in settingSub["enemies"]:
                             for rowNR, candidate in trainedSpec.loc[(trainedSpec["EA"] == int(eaName)) & (trainedSpec["Enemy"] == enemy)].nlargest(int(round((settingSub["settings"]["popSize"]*(1-settingSub["Noise"]))/len(settingSub["enemies"]))*len(settingSub["enemies"])/len(settingSub["enemies"])),"Fitness").iterrows():
