@@ -37,11 +37,11 @@ class EA():
         self.toolbox = base.Toolbox()
         creator.create("Fitness", base.Fitness, weights=(1.0,))      
         creator.create("IndividualContainer", list, fitness=creator.Fitness)
-        self.toolbox.register("initialSensor", random.uniform, -1, 1)
+        self.toolbox.register("initialSensor", random.uniform, -100, 100)
         self.toolbox.register("individual", tools.initRepeat, creator.IndividualContainer, self.toolbox.initialSensor, n=((self.env.get_num_sensors()+1) * NEURONS + (NEURONS + 1) * 5))
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("mate", tools.cxTwoPoint)
-        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
+        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=4, indpb=0.7)
         if self.settings["settings"]["selType"] == "tournament":
             self.toolbox.register("select", tools.selTournament, tournsize=self.settings["settings"]["tournamentSize"]) 
         elif self.settings["settings"]["selType"] == "roulette":

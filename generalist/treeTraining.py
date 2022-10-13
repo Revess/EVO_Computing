@@ -11,13 +11,13 @@ from deap import creator, base
 settings = {
     "name": "1_1_S_0",
     "settings": {
-        "popSize": 96,
+        "popSize": 96*2,
         "popInit": "random",
         "cxpb": 0.7,
         "mutpb": 0.4,
         "selType": "tournament",
-        "tournamentSize": 7,
-        "ngens": 40
+        "tournamentSize": 64,
+        "ngens": 20
     },
     "Noise": 0
 }
@@ -38,7 +38,7 @@ tournament = {
 }
 
 for eaRun in range(1,3):
-    for rnd in range(1):
+    for rnd in range(10):
         for tier in list(tournament.keys()):
             for match in tournament[tier].values():
                 population = []
