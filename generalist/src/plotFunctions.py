@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Train results
-def get_train_plot(data_frame, enemy_number, evo_number, ax):
-    enemy = data_frame[data_frame.enemy == enemy_number]
+def get_train_plot(data_frame, group_number, evo_number, ax):
+    enemy = data_frame[data_frame.enemy == group_number]
     enemy = enemy[enemy.evo == evo_number]
 
     # Mean of maxs results

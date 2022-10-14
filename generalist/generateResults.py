@@ -4,7 +4,7 @@ import src.plotFunctions as pf
 import seaborn as sns
 
 # Training results
-trainres = pd.read_csv('./data/trainingResultsAltFitness.csv')
+trainres = pd.read_csv('./data/CSV/trainingGeneralists.csv')
 fig, ax = plt.subplots(2,3)
 fig.suptitle('Fitness values over generations per enemy per EA-method', x =0.5, y = 0.94)
 for i in range(2):
@@ -12,7 +12,7 @@ for i in range(2):
         ev = 0
     elif i == 1:
         ev = 1
-    for j in range(3):
+    for j in range(4):
         if j == 0:
             en = 2
         elif j == 1:
@@ -32,13 +32,13 @@ plt.show()
 
 # Gain results
 sns.set(font_scale = 1.2, style = 'ticks')
-testres = pd.read_csv('./data/testRestultsAltFitness.csv')
+testres = pd.read_csv('./data/CSV/trainingGeneralists.csv')
 pf.get_test_boxplot(testres)
 plt.show()
 #plt.savefig('Boxplot of gain score per EA method.jpg') #Uncomment and comment plt.show() to save an image of the plot
 
 # Baseline comparison
-testres_bas = pd.read_csv('./data/testRestultsBaseline.csv')
+testres_bas = pd.read_csv('./data/CSV/trainingGeneralists.csv')
 pf.get_bas_alt_scatter(alt_df=testres, base_df=testres_bas)
 plt.show()
 #plt.savefig('Scatterplot of fitness functions.jpg') #Uncomment and comment plt.show() to save an image of the plot
