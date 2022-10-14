@@ -62,7 +62,7 @@ class Environment(object):
         self.playermode = playermode
         self.enemymode = enemymode
         self.speed = speed
-        self.visualmode = "no"
+        self.visualmode = "yes"
         self.inputscoded = inputscoded
         self.randomini = randomini
         self.sound = sound

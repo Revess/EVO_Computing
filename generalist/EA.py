@@ -16,45 +16,45 @@ class EA():
         testSettings(settings)
         self.settings = settings
         NEURONS = 10
-        if "S" in settings["name"].split("_")[0]:
-            mode = "no"
-        else:
-            mode = "yes"
-        self.env = Environment(
-            multiplemode=mode,
-            enemies=self.settings["enemies"],
-            level=2,
-            speed="fastest",
-            sound="off",
-            logs="off",
-            savelogs="no",
-            timeexpire=3000,
-            clockprec="low",
-            randomini="yes",
-            player_controller=player_controller(NEURONS)
-        )
-
         self.toolbox = base.Toolbox()
         creator.create("Fitness", base.Fitness, weights=(1.0,))      
         creator.create("IndividualContainer", list, fitness=creator.Fitness)
-        self.toolbox.register("initialSensor", random.uniform, -100, 100)
-        self.toolbox.register("individual", tools.initRepeat, creator.IndividualContainer, self.toolbox.initialSensor, n=((self.env.get_num_sensors()+1) * NEURONS + (NEURONS + 1) * 5))
+        self.toolbox.register("initialSensor", random.uniform, -1, 1)
+        self.toolbox.register("individual", tools.initRepeat, creator.IndividualContainer, self.toolbox.initialSensor, n=((20+1) * NEURONS + (NEURONS + 1) * 5))
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("mate", tools.cxTwoPoint)
-        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=4, indpb=0.7)
-        if self.settings["settings"]["selType"] == "tournament":
-            self.toolbox.register("select", tools.selTournament, tournsize=self.settings["settings"]["tournamentSize"]) 
-        elif self.settings["settings"]["selType"] == "roulette":
-            self.toolbox.register("select", tools.selRoulette) 
+        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
+        self.toolbox.register("select", tools.selTournament, tournsize=self.settings["settings"]["tournamentSize"]) 
 
-        self.cxpbStep = (self.settings["settings"]["cxpb"]-0.2)/self.settings["settings"]["ngens"]
-        self.mutpbStep = (self.settings["settings"]["mutpb"]-0.2)/self.settings["settings"]["ngens"]
         self.cxpb = self.settings["settings"]["cxpb"]
-        self.mutpb = 0.2
+        self.mutpb = 0.1
 
         def evaluate(individual):
-            f,p,e,t = self.env.play(pcont=np.array(individual))
-            return f,p,e,t
+            totalF = []
+            totalP = []
+            totalE = []
+            totalT = []
+            for enemy in self.settings["enemies"]:
+                self.env = Environment(
+                    multiplemode="no",
+                    enemies=[enemy],
+                    level=2,
+                    speed="fastest",
+                    sound="off",
+                    logs="off",
+                    savelogs="no",
+                    timeexpire=3000,
+                    clockprec="low",
+                    randomini="no",
+                    player_controller=player_controller(NEURONS)
+                )
+                f,p,e,t = self.env.play(pcont=np.array(individual))
+                totalF.append(f)
+                totalP.append(p)
+                totalE.append(e)
+                totalT.append(t)
+
+            return self.env.cons_multi(np.array(totalF)),self.env.cons_multi(np.array(totalP)),self.env.cons_multi(np.array(totalE)),self.env.cons_multi(np.array(totalT)), totalF, totalP, totalE, totalT
 
         self.toolbox.register("evaluate", evaluate)
 
@@ -65,14 +65,12 @@ class EA():
             self.popsize = self.settings["settings"]["popSize"]
             self.population = self.toolbox.population(n=self.popsize)
         elif type(self.settings["settings"]["popInit"]) == type([]):
-            self.popNoise = self.settings["settings"]["popSize"] - round((self.settings["settings"]["popSize"]*(1-self.settings["Noise"]))/len(self.settings["enemies"]))*len(self.settings["enemies"])
             self.popsize = self.settings["settings"]["popSize"]
             self.population = []
             for candidate in self.settings["settings"]["popInit"]:
                 with open("./data/checkpoints/"+candidate[0], "rb") as cp:
                     checkpoint = pkl.load(cp)
                     self.population.append(checkpoint[0][int(candidate[1])])
-            self.population.extend(self.toolbox.population(n=self.popNoise))
         else:
             exit("FATAL ERROR NO POPULATION CREATED")
         self.populations = []
@@ -107,7 +105,8 @@ class EA():
         with open("./data/checkpoints/" + self.settings["name"] + "/" + str(gen+1) + ".pkl", "wb") as cp:
             pkl.dump([self.population, self.history, self.HoF, self.dataPerGen], cp)
 
-        print(" Generation Avg:", np.mean([ind.fitness.values[0] for ind in self.population]))
+        print("Generation Avg:", np.mean([ind.fitness.values[0] for ind in self.population]))
+        print("Generation Max:", np.max([ind.fitness.values[0] for ind in self.population]))
 
     def train(self):
         fitnesses = list(tqdm(map(self.toolbox.evaluate, self.population),total=self.settings["settings"]["popSize"]))
@@ -123,10 +122,14 @@ class EA():
         with open("./data/checkpoints/" + self.settings["name"] + "/" + str(0) + ".pkl", "wb") as cp:
             pkl.dump([self.population, self.history, self.HoF, self.dataPerGen], cp)
         
+        print("gGeneration Avg:", np.mean([ind.fitness.values[0] for ind in self.population]))
+        print("Generation Max:", np.max([ind.fitness.values[0] for ind in self.population]))
+        
         for generation in tqdm(range(self.settings["settings"]["ngens"])):
             self.generation(generation)
-            self.cxpb = self.settings["settings"]["cxpb"] - (generation * self.cxpbStep)
-            self.mutpb = 0.2 + (generation * self.mutpbStep)
+            self.cxpb = self.settings["settings"]["cxpb"] - (generation * ((self.settings["settings"]["cxpb"]-0.1)/self.settings["settings"]["ngens"]))
+            self.mutpb = 0.1 + (generation * ((self.settings["settings"]["mutpb"]-0.1)/self.settings["settings"]["ngens"]))
+            self.toolbox.register("select", tools.selTournament, tournsize=round(2+(generation*((self.settings["settings"]["tournamentSize"]-2)/self.settings["settings"]["ngens"])))) 
 
         self.terminate()
 

@@ -7,7 +7,7 @@ parser.add_argument('-R', '--rnd', type=int, default=5, help='Number of rounds, 
 parser.add_argument('-S', '--slow', help='Slow output', action='store_true')
 parser.add_argument('-D', '--display', help='Display output', action='store_true')
 args = parser.parse_args()
-assert args.ea == "bothEA" or args.ea == "EA1" or args.ea == "EA2" or args.ea == "Specialists1" or args.ea == "Specialists2" or args.ea == "bothSE"
+assert args.ea == "G" or args.ea == "Specialists1" or args.ea == "Specialists2" or args.ea == "bothSE"
 assert args.type == "all" or args.type == "S" or args.type == "R"
 assert args.group == "all" or args.group == "1" or args.group == "2"
 assert args.rnd > 0
@@ -101,13 +101,7 @@ if "Specialists" in args.ea or args.ea == "bothSE":
 
 else:
     trainingData = pd.read_csv("./data/CSV/trainingGeneralists.csv")
-    testScores = { "EA": [], "Group": [], "Type": [], "Training Round": [], "Generation": [], "Individual": [], "Testing Round": [], "Fitness": [], "Player Health": [], "Enemy Health": [], "Time": [], "Weights": [] }
-    if args.ea == "EA1":
-        eas = [1]
-    elif args.ea == "EA2":
-        eas = [2]
-    elif args.ea == "bothEA":
-        eas = [1,  2]
+    testScores = { "EA": [], "Group": [], "Type": [], "Training Round": [], "Generation": [], "Individual": [], "Enemy": [], "Testing Round": [], "Fitness": [], "Player Health": [], "Enemy Health": [], "Time": [], "Weights": [] }
     if args.type == "all":
         types = ["S", "R"]
     else:
@@ -117,60 +111,97 @@ else:
     else:
         groups = [int(args.group)]
 
-    for eaRun in eas:
-        for type_ in types:
-            for group in groups:
-                for rnd in range(trainingData["Round"].max()+1):
-                    bestPlayer = trainingData.loc[(trainingData["EA"]==eaRun) & (trainingData["Group"]==group) & (trainingData["Type"]==type_) & (trainingData["Round"]==rnd)].nlargest(1,"Fitness").to_dict()
-                    if len(bestPlayer["EA"]) > 0:
-                        with open("./data/checkpoints/"+ str(list(bestPlayer["EA"].values())[0]) + "_" + str(list(bestPlayer["Group"].values())[0]) + "_" + str(list(bestPlayer["Type"].values())[0]) + "_" + str(list(bestPlayer["Round"].values())[0]) +"/"+str(list(bestPlayer["Generation"].values())[0])+".pkl", "rb") as cp:
-                            player = pkl.load(cp)[0][list(bestPlayer["Individual"].values())[0]]
-                        with open("./settings.json", "r") as json_file:
-                            enemies = json.load(json_file)["EA"+str(list(bestPlayer["EA"].values())[0])][str(list(bestPlayer["Type"].values())[0])+"_"+str(list(bestPlayer["Group"].values())[0])]["enemies"]
-                        print("Testing: ", str(list(bestPlayer["EA"].values())[0]) + "_" + str(list(bestPlayer["Group"].values())[0]) + "_" + str(list(bestPlayer["Type"].values())[0]) + "_" + str(list(bestPlayer["Round"].values())[0]) +"/"+str(list(bestPlayer["Generation"].values())[0])+".pkl")
-                        for r in tqdm(range(args.rnd)):
-                            env = Environment(
-                                multiplemode="yes",
-                                enemies=[1,2,3,4,5,6,7,8],
-                                level=2,
-                                speed=SPEED,
-                                sound="off",
-                                logs="off",
-                                savelogs="no",
-                                timeexpire=3000,
-                                clockprec="low",
-                                randomini="yes",
-                                player_controller=player_controller(10)
-                            )
-                            f,p,e,t = env.play(pcont=np.array(player))
-                            testScores["EA"].append(str(list(bestPlayer["EA"].values())[0]))
-                            testScores["Group"].append(str(list(bestPlayer["Group"].values())[0]))
-                            testScores["Type"].append(str(list(bestPlayer["Type"].values())[0]))
-                            testScores["Training Round"].append(str(list(bestPlayer["Round"].values())[0]))
-                            testScores["Generation"].append(str(list(bestPlayer["Generation"].values())[0]))
-                            testScores["Individual"].append(str(list(bestPlayer["Individual"].values())[0]))
-                            testScores["Testing Round"].append(r)
-                            testScores["Fitness"].append(f)
-                            testScores["Player Health"].append(p)
-                            testScores["Enemy Health"].append(e)
-                            testScores["Time"].append(t)
-                            testScores["Weights"].append(player)
-    if len(testScores["EA"]) > 0:
-        if len(eas) > 1:
-            pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-        else: 
-            if os.path.exists("./data/CSV/testScoresGeneralists.csv"):
-                df = pd.read_csv("./data/CSV/testScoresGeneralists.csv")
-                if (1 in list(df["EA"].unique()) and 2 not in list(df["EA"].unique()) and eaRun == 1) or (1 not in list(df["EA"].unique()) and 2 in list(df["EA"].unique()) and eaRun == 2):
-                    pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-                elif 1 not in list(df["EA"].unique()) and 2 in list(df["EA"].unique()) and eaRun == 1:
-                    pd.concat([pd.DataFrame.from_dict(testScores), df]).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-                elif 1 in list(df["EA"].unique()) and 2 not in list(df["EA"].unique()) and eaRun == 2:
-                    pd.concat([df, pd.DataFrame.from_dict(testScores)]).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-                elif eaRun == 1:
-                    pd.concat([pd.DataFrame.from_dict(testScores), df.loc[(df["EA"] == 2)]]).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-                elif eaRun == 2:
-                    pd.concat([df[(df["EA"] == 1)], pd.DataFrame.from_dict(testScores)]).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-                pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
+    for type_ in types:
+        for group in groups:
+            df = pd.read_csv("./data/CSV/parsedTrainingDataGroup" + str(group) + ".csv")
+            if group == 1:
+                enemies = list(range(1,9))
             else:
-                pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
+                enemies = [3,5,7,8]
+            for rnd in range(trainingData["Round"].max()+1):
+                bestPlayer = df.loc[(df["Type"] == type_) & (df["Round"] == rnd)].sort_values(["Relative Beaten", "Sum Player Health", "Sum Time"], ascending=[False, False, True]).iloc[0]
+                with open("./data/checkpoints/"+ "1_" + str(bestPlayer["Group"]) + "_" + bestPlayer["Type"] + "_" + str(bestPlayer["Round"]) +"/"+str(bestPlayer["Generation"])+".pkl", "rb") as cp:
+                    player = pkl.load(cp)[0][bestPlayer["Individual"]]
+                print("Testing: ", "1_" + str(bestPlayer["Group"]) + "_" + bestPlayer["Type"] + "_" + str(bestPlayer["Round"]) +"/"+str(bestPlayer["Generation"])+".pkl")
+                for r in tqdm(range(args.rnd)):
+                    for enemy in enemies:
+                        env = Environment(
+                            multiplemode="no",
+                            enemies=[enemy],
+                            level=2,
+                            speed=SPEED,
+                            sound="off",
+                            logs="off",
+                            savelogs="no",
+                            timeexpire=3000,
+                            clockprec="low",
+                            randomini="no",
+                            player_controller=player_controller(10)
+                        )
+                        f,p,e,t = env.play(pcont=np.array(player))
+                        testScores["EA"].append("1")
+                        testScores["Group"].append(str(bestPlayer["Group"]))
+                        testScores["Type"].append(str(bestPlayer["Type"]))
+                        testScores["Training Round"].append(str(bestPlayer["Round"]))
+                        testScores["Generation"].append(str(bestPlayer["Generation"]))
+                        testScores["Individual"].append(str(bestPlayer["Individual"]))
+                        testScores["Enemy"].append(enemy)
+                        testScores["Testing Round"].append(r)
+                        testScores["Fitness"].append(f)
+                        testScores["Player Health"].append(p)
+                        testScores["Enemy Health"].append(e)
+                        testScores["Time"].append(t)
+                        testScores["Weights"].append(player)
+    pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
+'''
+else:
+    trainingData = pd.read_csv("./data/CSV/trainingGeneralists.csv")
+    testScores = { "EA": [], "Group": [], "Type": [], "Training Round": [], "Generation": [], "Individual": [], "Testing Round": [], "Fitness": [], "Player Health": [], "Enemy Health": [], "Time": [], "Weights": [] }
+    if args.type == "all":
+        types = ["S", "R"]
+    else:
+        types = [args.type]
+    if args.group == "all":
+        groups = [1, 2]
+    else:
+        groups = [int(args.group)]
+
+    for type_ in types:
+        for group in groups:
+            for rnd in range(trainingData["Round"].max()+1):
+                bestPlayer = trainingData.loc[(trainingData["EA"]==1) & (trainingData["Group"]==group) & (trainingData["Type"]==type_) & (trainingData["Round"]==rnd)].nlargest(1,"Fitness").to_dict()
+                if len(bestPlayer["EA"]) > 0:
+                    with open("./data/checkpoints/"+ str(list(bestPlayer["EA"].values())[0]) + "_" + str(list(bestPlayer["Group"].values())[0]) + "_" + str(list(bestPlayer["Type"].values())[0]) + "_" + str(list(bestPlayer["Round"].values())[0]) +"/"+str(list(bestPlayer["Generation"].values())[0])+".pkl", "rb") as cp:
+                        player = pkl.load(cp)[0][list(bestPlayer["Individual"].values())[0]]
+                    with open("./settings.json", "r") as json_file:
+                        enemies = json.load(json_file)["EA"+str(list(bestPlayer["EA"].values())[0])][str(list(bestPlayer["Type"].values())[0])+"_"+str(list(bestPlayer["Group"].values())[0])]["enemies"]
+                    print("Testing: ", str(list(bestPlayer["EA"].values())[0]) + "_" + str(list(bestPlayer["Group"].values())[0]) + "_" + str(list(bestPlayer["Type"].values())[0]) + "_" + str(list(bestPlayer["Round"].values())[0]) +"/"+str(list(bestPlayer["Generation"].values())[0])+".pkl")
+                    for r in tqdm(range(args.rnd)):
+                        env = Environment(
+                            multiplemode="yes",
+                            enemies=[1,2,3,4,5,6,7,8],
+                            level=2,
+                            speed=SPEED,
+                            sound="off",
+                            logs="off",
+                            savelogs="no",
+                            timeexpire=3000,
+                            clockprec="low",
+                            randomini="no",
+                            player_controller=player_controller(10)
+                        )
+                        f,p,e,t = env.play(pcont=np.array(player))
+                        testScores["EA"].append(str(list(bestPlayer["EA"].values())[0]))
+                        testScores["Group"].append(str(list(bestPlayer["Group"].values())[0]))
+                        testScores["Type"].append(str(list(bestPlayer["Type"].values())[0]))
+                        testScores["Training Round"].append(str(list(bestPlayer["Round"].values())[0]))
+                        testScores["Generation"].append(str(list(bestPlayer["Generation"].values())[0]))
+                        testScores["Individual"].append(str(list(bestPlayer["Individual"].values())[0]))
+                        testScores["Testing Round"].append(r)
+                        testScores["Fitness"].append(f)
+                        testScores["Player Health"].append(p)
+                        testScores["Enemy Health"].append(e)
+                        testScores["Time"].append(t)
+                        testScores["Weights"].append(player)
+    pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
+'''
