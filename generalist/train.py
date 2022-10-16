@@ -1,3 +1,6 @@
+'''
+The main training file
+'''
 import argparse
 parser = argparse.ArgumentParser(description='Train the EA algorithm for EVOMAN')
 parser.add_argument('-EA', '--ea', type=str, required=True, help='Which type to train, either: G or S')
@@ -62,11 +65,14 @@ if args.ea == "S":
             ea.train()
             del ea
 else:
+    ##TRAIN THE GENERALISTS
     for group in groups:
         for type_ in types:
             setting = settings[type_+"_"+group]
             for rnd in range(args.rnd):
+                #SET THE NAME
                 setting["name"] =  "1_" + group + "_" + type_ + "_" + str(rnd)
+                #SET THE POPULATION
                 if type_ == "S":
                     print("Running on population size:", round(setting["settings"]["popSize"]/len(setting["enemies"]))*len(setting["enemies"]))
                     trainedSpec = pd.read_csv("./data/CSV/trainingSpecialists.csv").sort_values("Fitness", ascending=False).drop_duplicates('ids')
@@ -79,6 +85,7 @@ else:
                     setting["settings"]["popInit"] = "random"
                 if not os.path.exists("./data/checkpoints/" + setting["name"]):
                     os.mkdir("./data/checkpoints/" + setting["name"])
+                #TRAIN
                 print("Running:", setting["name"])
                 ea = EA(setting)
                 ea.train()

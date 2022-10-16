@@ -1,3 +1,6 @@
+'''
+File meant for testing a trained EA
+'''
 import argparse
 parser = argparse.ArgumentParser(description='Train the EA algorithm for EVOMAN')
 parser.add_argument('-EA', '--ea', type=str, required=True, help='Which type to test, either: both, EA1, EA2, bothSE, Specialists1 or Specialists2')
@@ -36,6 +39,7 @@ creator.create("Fitness", base.Fitness, weights=(1.0,))
 creator.create("IndividualContainer", list, fitness=creator.Fitness)
 
 if "Specialists" in args.ea or args.ea == "bothSE":
+    ##TEST THE SPECIALISTS
     if args.ea == "Specialists1":
         sEAs = [1]
     elif args.ea == "Specialists2":
@@ -100,6 +104,7 @@ if "Specialists" in args.ea or args.ea == "bothSE":
                 pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresSpecialists.csv",index=False)
 
 else:
+    ##TEST THE GENERALISTS
     trainingData = pd.read_csv("./data/CSV/trainingGeneralists.csv")
     testScores = { "EA": [], "Group": [], "Type": [], "Training Round": [], "Generation": [], "Individual": [], "Enemy": [], "Testing Round": [], "Fitness": [], "Player Health": [], "Enemy Health": [], "Time": [], "Weights": [] }
     if args.type == "all":
@@ -124,6 +129,7 @@ else:
                     player = pkl.load(cp)[0][bestPlayer["Individual"]]
                 print("Testing: ", "1_" + str(bestPlayer["Group"]) + "_" + bestPlayer["Type"] + "_" + str(bestPlayer["Round"]) +"/"+str(bestPlayer["Generation"])+".pkl")
                 for r in tqdm(range(args.rnd)):
+                    ##THEST AGAINST EVERY ENEMY
                     for enemy in enemies:
                         env = Environment(
                             multiplemode="no",
@@ -152,56 +158,5 @@ else:
                         testScores["Enemy Health"].append(e)
                         testScores["Time"].append(t)
                         testScores["Weights"].append(player)
+    ##Write the CSV away
     pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-'''
-else:
-    trainingData = pd.read_csv("./data/CSV/trainingGeneralists.csv")
-    testScores = { "EA": [], "Group": [], "Type": [], "Training Round": [], "Generation": [], "Individual": [], "Testing Round": [], "Fitness": [], "Player Health": [], "Enemy Health": [], "Time": [], "Weights": [] }
-    if args.type == "all":
-        types = ["S", "R"]
-    else:
-        types = [args.type]
-    if args.group == "all":
-        groups = [1, 2]
-    else:
-        groups = [int(args.group)]
-
-    for type_ in types:
-        for group in groups:
-            for rnd in range(trainingData["Round"].max()+1):
-                bestPlayer = trainingData.loc[(trainingData["EA"]==1) & (trainingData["Group"]==group) & (trainingData["Type"]==type_) & (trainingData["Round"]==rnd)].nlargest(1,"Fitness").to_dict()
-                if len(bestPlayer["EA"]) > 0:
-                    with open("./data/checkpoints/"+ str(list(bestPlayer["EA"].values())[0]) + "_" + str(list(bestPlayer["Group"].values())[0]) + "_" + str(list(bestPlayer["Type"].values())[0]) + "_" + str(list(bestPlayer["Round"].values())[0]) +"/"+str(list(bestPlayer["Generation"].values())[0])+".pkl", "rb") as cp:
-                        player = pkl.load(cp)[0][list(bestPlayer["Individual"].values())[0]]
-                    with open("./settings.json", "r") as json_file:
-                        enemies = json.load(json_file)["EA"+str(list(bestPlayer["EA"].values())[0])][str(list(bestPlayer["Type"].values())[0])+"_"+str(list(bestPlayer["Group"].values())[0])]["enemies"]
-                    print("Testing: ", str(list(bestPlayer["EA"].values())[0]) + "_" + str(list(bestPlayer["Group"].values())[0]) + "_" + str(list(bestPlayer["Type"].values())[0]) + "_" + str(list(bestPlayer["Round"].values())[0]) +"/"+str(list(bestPlayer["Generation"].values())[0])+".pkl")
-                    for r in tqdm(range(args.rnd)):
-                        env = Environment(
-                            multiplemode="yes",
-                            enemies=[1,2,3,4,5,6,7,8],
-                            level=2,
-                            speed=SPEED,
-                            sound="off",
-                            logs="off",
-                            savelogs="no",
-                            timeexpire=3000,
-                            clockprec="low",
-                            randomini="no",
-                            player_controller=player_controller(10)
-                        )
-                        f,p,e,t = env.play(pcont=np.array(player))
-                        testScores["EA"].append(str(list(bestPlayer["EA"].values())[0]))
-                        testScores["Group"].append(str(list(bestPlayer["Group"].values())[0]))
-                        testScores["Type"].append(str(list(bestPlayer["Type"].values())[0]))
-                        testScores["Training Round"].append(str(list(bestPlayer["Round"].values())[0]))
-                        testScores["Generation"].append(str(list(bestPlayer["Generation"].values())[0]))
-                        testScores["Individual"].append(str(list(bestPlayer["Individual"].values())[0]))
-                        testScores["Testing Round"].append(r)
-                        testScores["Fitness"].append(f)
-                        testScores["Player Health"].append(p)
-                        testScores["Enemy Health"].append(e)
-                        testScores["Time"].append(t)
-                        testScores["Weights"].append(player)
-    pd.DataFrame.from_dict(testScores).to_csv("./data/CSV/testScoresGeneralists.csv",index=False)
-'''

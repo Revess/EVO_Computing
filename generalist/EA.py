@@ -1,3 +1,8 @@
+'''
+Class for running a single instance of evoman
+You can initialize the evoman with editing the settings.json
+This can be found in the root together with this file
+'''
 import sys, os
 sys.path.insert(0, 'evoman') 
 from environment import Environment
@@ -58,12 +63,15 @@ class EA():
 
         self.toolbox.register("evaluate", evaluate)
 
+        ##Setup the population
         self.history = tools.History()
         self.HoF = tools.HallOfFame(5)
         self.dataPerGen = []
+        ##Random INI
         if self.settings["settings"]["popInit"] == "random":
             self.popsize = self.settings["settings"]["popSize"]
             self.population = self.toolbox.population(n=self.popsize)
+        ##Pretrained model
         elif type(self.settings["settings"]["popInit"]) == type([]):
             self.popsize = self.settings["settings"]["popSize"]
             self.population = []
@@ -76,19 +84,21 @@ class EA():
         self.populations = []
 
     def generation(self, gen):
+        ##Parent selection
         offspring = list(map(self.toolbox.clone, self.toolbox.select(self.population, len(self.population))))
         tempData = [self.dataPerGen[gen][[ind[0] for ind in self.dataPerGen[gen]].index(ind.fitness.values[0])] for ind in offspring]
+        ##Crossover
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < self.cxpb:
                 self.toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
-
+        ##Mutation
         for index, mutant in enumerate(offspring):
             if random.random() < self.mutpb:
                 self.toolbox.mutate(mutant)
                 del mutant.fitness.values
-        
+        ##Evaluate the survivors
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         tempData = [tempData[index] for index, ind in enumerate(offspring) if ind.fitness.valid]
         fitnesses = list(map(self.toolbox.evaluate, invalid_ind))
@@ -97,7 +107,7 @@ class EA():
             fitnesses[index] = fitness[0]
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = (fit,)
-
+        ##Survivor selection
         self.population[:] = offspring
         self.history.update(self.population)
         self.HoF.update(self.population)
@@ -109,6 +119,7 @@ class EA():
         print("Generation Max:", np.max([ind.fitness.values[0] for ind in self.population]))
 
     def train(self):
+        ##Initial evaluation of the population
         fitnesses = list(tqdm(map(self.toolbox.evaluate, self.population),total=self.settings["settings"]["popSize"]))
         self.dataPerGen.append(fitnesses.copy())
         for index, fitness in enumerate(fitnesses):
@@ -122,11 +133,13 @@ class EA():
         with open("./data/checkpoints/" + self.settings["name"] + "/" + str(0) + ".pkl", "wb") as cp:
             pkl.dump([self.population, self.history, self.HoF, self.dataPerGen], cp)
         
-        print("gGeneration Avg:", np.mean([ind.fitness.values[0] for ind in self.population]))
+        print("Generation Avg:", np.mean([ind.fitness.values[0] for ind in self.population]))
         print("Generation Max:", np.max([ind.fitness.values[0] for ind in self.population]))
         
+        ##Start of the training
         for generation in tqdm(range(self.settings["settings"]["ngens"])):
             self.generation(generation)
+            #This takes care of the cross-fade
             self.cxpb = self.settings["settings"]["cxpb"] - (generation * ((self.settings["settings"]["cxpb"]-0.1)/self.settings["settings"]["ngens"]))
             self.mutpb = 0.1 + (generation * ((self.settings["settings"]["mutpb"]-0.1)/self.settings["settings"]["ngens"]))
             self.toolbox.register("select", tools.selTournament, tournsize=round(2+(generation*((self.settings["settings"]["tournamentSize"]-2)/self.settings["settings"]["ngens"])))) 
@@ -134,6 +147,7 @@ class EA():
         self.terminate()
 
     def terminate(self):
+        ##Here the final data will be written
         fitnessPerGen = []
         playerPerGen = []
         enemyPerGen = []

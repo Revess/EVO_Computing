@@ -1,3 +1,6 @@
+'''
+Place to generate the CSV files for evaluation
+'''
 import pickle as pkl
 import pandas as pd
 from deap import tools, base, creator
@@ -13,19 +16,19 @@ for file in os.listdir("./data/trainingresults"):
     parseFile = file.split(".")[0].split("_")
     if "S" in parseFile[0]:
         pass
-        # with open("./data/trainingresults/" + file, "rb") as file_:
-        #     data = pkl.load(file_)
-        # for generation in range(len(data[0])):
-        #     for ind in range(len(data[0][generation])):
-        #         trainingSpecialists["EA"].append(int(parseFile[0][1]))
-        #         trainingSpecialists["Enemy"].append(int(parseFile[1]))
-        #         trainingSpecialists["Round"].append(int(parseFile[2]))
-        #         trainingSpecialists["Generation"].append(generation)
-        #         trainingSpecialists["Individual"].append(ind)
-        #         trainingSpecialists["Fitness"].append(data[0][generation][ind])
-        #         trainingSpecialists["Player Health"].append(data[1][generation][ind])
-        #         trainingSpecialists["Enemy Health"].append(data[2][generation][ind])
-        #         trainingSpecialists["Time"].append(data[3][generation][ind])
+        with open("./data/trainingresults/" + file, "rb") as file_:
+            data = pkl.load(file_)
+        for generation in range(len(data[0])):
+            for ind in range(len(data[0][generation])):
+                trainingSpecialists["EA"].append(int(parseFile[0][1]))
+                trainingSpecialists["Enemy"].append(int(parseFile[1]))
+                trainingSpecialists["Round"].append(int(parseFile[2]))
+                trainingSpecialists["Generation"].append(generation)
+                trainingSpecialists["Individual"].append(ind)
+                trainingSpecialists["Fitness"].append(data[0][generation][ind])
+                trainingSpecialists["Player Health"].append(data[1][generation][ind])
+                trainingSpecialists["Enemy Health"].append(data[2][generation][ind])
+                trainingSpecialists["Time"].append(data[3][generation][ind])
     elif "TOURN" not in parseFile[0]:
         with open("./data/trainingresults/" + file, "rb") as file_:
             data = pkl.load(file_)
