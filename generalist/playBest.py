@@ -22,7 +22,9 @@ for group in [1,2]:
             dataTest["Weights"].append(ind["Weights"].iloc[0])
 
 testingRest = pd.DataFrame.from_dict(dataTest)
-veryBest = testingRest.loc[(testingRest["Group"] == 2)].sort_values(["Enemies Beaten", "Sum Player Health", "Sum Time"], ascending=[False, False, True]).iloc[0]
+veryBest = testingRest.sort_values(["Enemies Beaten", "Sum Player Health", "Sum Time"], ascending=[False, False, True]).iloc[0]
+with open("./group52.txt", "w") as file_:
+    file_.write(veryBest["Weights"][1:-1].replace(",","\n").replace(" ",""))
 
 for enemy in [1,2,3,4,5,6,7,8]:
     env = Environment(
